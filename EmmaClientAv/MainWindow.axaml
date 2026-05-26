@@ -1,0 +1,87 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="600"
+        x:Class="EmmaClientAv.MainWindow"
+        Title="Emma Gestionale Client"
+        Background="#F5F7FA">
+
+    <Grid RowDefinitions="Auto, *">
+        
+        <!-- Titolo della Dashboard -->
+        <StackPanel Grid.Row="0" Margin="0,35,0,15" HorizontalAlignment="Center">
+            <TextBlock Text="Benvenuto" FontSize="28" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center"/>
+            <TextBlock Text="Seleziona un'operazione per iniziare" FontSize="14" Foreground="#64748B" Margin="0,5,0,0" HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Griglia principale dei Pulsanti (2 righe, 3 colonne) -->
+        <UniformGrid Grid.Row="1" 
+                     Rows="2" 
+                     Columns="3" 
+                     HorizontalAlignment="Center" 
+                     VerticalAlignment="Center"
+                     Margin="20"
+                     MaxWidth="700">
+            
+            <!-- ================= RIGA 1: OPERAZIONI DI CARICAMENTO ================= -->
+            
+            <!-- CARD 1: CARICA ORDINE -->
+            <Button Name="BtnOrdine" Width="180" Height="180" Margin="12" Click="Button_OnClick"
+                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+                    <TextBlock Text="📦" FontSize="42" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Carica Ordine" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <!-- CARD 2: CARICA DDT -->
+            <Button Name="BtnDdt" Width="180" Height="180" Margin="12" Click="Button_OnClick"
+                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+                    <TextBlock Text="🚚" FontSize="42" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Carica DDT" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <!-- CARD 3: CARICA FATTURA -->
+            <Button Name="BtnFattura" Width="180" Height="180" Margin="12" Click="Button_OnClick"
+                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+                    <TextBlock Text="📄" FontSize="42" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Carica Fattura" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <!-- ================= RIGA 2: GESTIONE E STRUMENTI ================= -->
+
+            <!-- CARD 4: CONCILIAZIONE -->
+            <Button Name="BtnConciliazione" Width="180" Height="180" Margin="12" Click="Button_OnClick"
+                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+                    <TextBlock Text="🔄" FontSize="42" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Conciliazione" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <!-- CARD 5: SINCRONIZZAZIONE -->
+            <Button Name="BtnSincronizzazione" Width="180" Height="180" Margin="12" Click="Button_OnClick"
+                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+                    <TextBlock Text="🌐" FontSize="42" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Sincronizza" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <!-- CARD 6: CONFIGURAZIONE -->
+            <Button Name="BtnConfigurazione" Width="180" Height="180" Margin="12" Click="Button_OnClick"
+                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+                    <TextBlock Text="⚙️" FontSize="42" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Impostazioni" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+        </UniformGrid>
+    </Grid>
+</Window>

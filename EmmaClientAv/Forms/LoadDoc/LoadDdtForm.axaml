@@ -1,0 +1,146 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:EmmaClientAv.Models"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+        x:Class="EmmaClientAv.Forms.LoadDoc.LoadDdtForm"
+        Title="Caricamento Documento"> 
+    
+    <Grid RowDefinitions="Auto, Auto, *" Margin="15">
+        
+        <Border Grid.Row="0"
+                Background="#F9F9F9"
+                BorderBrush="#E0E0E0"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="12"
+                Margin="0,0,0,15">
+    
+            <Grid ColumnDefinitions="*, Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="15" VerticalAlignment="Center">
+                    <Button Click="Button_OnClick"
+                            Background="#2196F3"
+                            Foreground="White"
+                            Padding="15,8"
+                            FontWeight="SemiBold"
+                            CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="📁" VerticalAlignment="Center"/>
+                            <TextBlock Text="Sfoglia ..." VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+    
+                    <TextBlock Name="LblNomeFile"
+                               Text="Nessun file selezionato"
+                               VerticalAlignment="Center"
+                               FontStyle="Italic"
+                               Foreground="#757575"
+                               FontWeight="Medium"
+                               TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+    
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    
+                    <Button Click="Button_SaveOnClick"
+                            Background="DodgerBlue"
+                            Foreground="White"
+                            Padding="12,8"
+                            CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="💾" VerticalAlignment="Center"/>
+                            <TextBlock Text="SalvaDocumento" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Button Click="BtnAggiungi_Click"
+                            Background="#4CAF50"
+                            Foreground="White"
+                            Padding="12,8"
+                            CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="➕" VerticalAlignment="Center"/>
+                            <TextBlock Text="Aggiungi Riga" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+    
+                    <Button Click="BtnElimina_Click"
+                            Background="#F44336"
+                            Foreground="White"
+                            Padding="12,8"
+                            CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="🗑️" VerticalAlignment="Center"/>
+                            <TextBlock Text="Elimina Riga" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        
+<Grid Grid.Row="1" RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, *" Margin="0,0,0,15">
+
+    <!-- RIGA 0: Fornitore e Tipo Documento -->
+    <Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="120, *" Margin="0,0,10,10">
+        <TextBlock Grid.Column="0" Text="Fornitore:" FontWeight="SemiBold" Foreground="#333333" VerticalAlignment="Center"/>
+        <TextBox Grid.Column="1" Name="TxtFornitore" PlaceholderText="Nome fornitore..." Height="35" VerticalContentAlignment="Center"/>
+    </Grid>
+
+    <Grid Grid.Row="0" Grid.Column="1" ColumnDefinitions="120, *" Margin="0,0,0,10">
+        <TextBlock Grid.Column="0" Text="Tipo Doc.:" FontWeight="SemiBold" Foreground="#333333" VerticalAlignment="Center"/>
+        <ComboBox Grid.Column="1" Name="CbTipoDocumento" PlaceholderText="Seleziona tipo..." Height="35" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+    </Grid>
+
+    <!-- RIGA 1: Numero Documento e Data -->
+    <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="120, *" Margin="0,0,10,10">
+        <TextBlock Grid.Column="0" Text="N° Documento:" FontWeight="SemiBold" Foreground="#333333" VerticalAlignment="Center"/>
+        <TextBox Grid.Column="1" Name="TxtNumeroDocumento" PlaceholderText="Numero Documento..." Height="35" VerticalContentAlignment="Center"/>
+    </Grid>
+
+    <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="120, *" Margin="0,0,0,10">
+        <TextBlock Grid.Column="0" Text="Data Doc.:" FontWeight="SemiBold" Foreground="#333333" VerticalAlignment="Center"/>
+        <CalendarDatePicker Grid.Column="1" Name="DpDataDocumento" Height="35" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+    </Grid>
+
+    <!-- RIGA 2: Imponibile e Totale -->
+    <Grid Grid.Row="2" Grid.Column="0" ColumnDefinitions="120, *" Margin="0,0,10,0">
+        <TextBlock Grid.Column="0" Text="Imponibile (€):" FontWeight="SemiBold" Foreground="#333333" VerticalAlignment="Center"/>
+        <!-- In Avalonia NumericUpDown è perfetto per i prezzi -->
+        <NumericUpDown Grid.Column="1" Name="NumImponibile" 
+                       FormatString="N2" ParsingNumberStyle="Currency"
+                       Height="35" VerticalContentAlignment="Center" 
+                       ButtonSpinnerLocation="Right"/>
+    </Grid>
+
+    <Grid Grid.Row="2" Grid.Column="1" ColumnDefinitions="120, *">
+        <TextBlock Grid.Column="0" Text="Totale (€):" FontWeight="SemiBold" Foreground="#333333" VerticalAlignment="Center"/>
+        <NumericUpDown Grid.Column="1" Name="NumTotale" 
+                       FormatString="N2" ParsingNumberStyle="Currency"
+                       Height="35" VerticalContentAlignment="Center" 
+                       ButtonSpinnerLocation="Right"/>
+    </Grid>
+
+</Grid>
+        
+        <DataGrid Grid.Row="2"
+                  Name="DataGridArticoli"
+                  x:DataType="models:ArticoloBolla"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="False"
+                  GridLinesVisibility="All"
+                  BorderThickness="1"
+                  BorderBrush="#D0D0D0"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Codice" Binding="{Binding Codice}" Width="120"/>
+                <DataGridTextColumn Header="Descrizione" Binding="{Binding Descrizione}" Width="*"/>
+                <DataGridTextColumn Header="Quantità" Binding="{Binding Quantita, StringFormat={}{0:N0}}" Width="100"/>
+                <DataGridTextColumn Header="U.M." Binding="{Binding UnitaMisura}" Width="70"/>
+                <DataGridTextColumn Header="Totale (€)" Binding="{Binding Totale}" Width="120"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    
+    </Grid>
+</Window>

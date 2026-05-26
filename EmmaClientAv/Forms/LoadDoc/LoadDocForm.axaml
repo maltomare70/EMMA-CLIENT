@@ -1,0 +1,89 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:EmmaClientAv.Models"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+        x:Class="EmmaClientAv.Forms.LoadDoc.LoadDocForm"
+        Title="Caricamento Documento"> 
+    
+    <Grid RowDefinitions="Auto, *" Margin="15">
+        <Border Grid.Row="0"
+                Background="#F9F9F9"
+                BorderBrush="#E0E0E0"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="12"
+                Margin="0,0,0,15">
+    
+            <Grid ColumnDefinitions="*, Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="15" VerticalAlignment="Center">
+                    <Button Click="Button_OnClick"
+                            Background="#2196F3"
+                            Foreground="White"
+                            Padding="15,8"
+                            FontWeight="SemiBold"
+                            CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="📁" VerticalAlignment="Center"/>
+                            <TextBlock Text="Sfoglia ..." VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+    
+                    <TextBlock Name="LblNomeFile"
+                               Text="Nessun file selezionato"
+                               VerticalAlignment="Center"
+                               FontStyle="Italic"
+                               Foreground="#757575"
+                               FontWeight="Medium"
+                               TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+    
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <Button Click="BtnAggiungi_Click"
+                            Background="#4CAF50"
+                            Foreground="White"
+                            Padding="12,8"
+                            CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="➕" VerticalAlignment="Center"/>
+                            <TextBlock Text="Aggiungi" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+    
+                    <Button Click="BtnElimina_Click"
+                            Background="#F44336"
+                            Foreground="White"
+                            Padding="12,8"
+                            CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="🗑️" VerticalAlignment="Center"/>
+                            <TextBlock Text="Elimina" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+    
+            </Grid>
+        </Border>
+    
+        <DataGrid Grid.Row="1"
+                  Name="DataGridArticoli"
+                  x:DataType="models:ArticoloBolla"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="False"
+                  GridLinesVisibility="All"
+                  BorderThickness="1"
+                  BorderBrush="#D0D0D0"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Codice" Binding="{Binding Codice}" Width="120"/>
+                <DataGridTextColumn Header="Descrizione" Binding="{Binding Descrizione}" Width="*"/>
+                <DataGridTextColumn Header="Quantità" Binding="{Binding Quantita}" Width="100"/>
+                <DataGridTextColumn Header="U.M." Binding="{Binding UnitaMisura}" Width="70"/>
+                <DataGridTextColumn Header="Totale (€)" Binding="{Binding Totale}" Width="120"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    
+    </Grid>
+</Window>
