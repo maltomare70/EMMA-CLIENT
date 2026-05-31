@@ -5,14 +5,21 @@ using System.Text.Json.Serialization;
 namespace EmmaClientAv.Models;
 
 
+
 // Questo rappresenta il JSON principale che unisce i costi e i dati estratti
-public class RispostaDdt
+public class DdtResponse
 {
+    [JsonPropertyName("model_name")]
+    public string? ModelName { get; set; }
+    
+    [JsonPropertyName("file_name")]
+    public string? FileNAme { get; set; }
+    
     [JsonPropertyName("costs")]
     public Costs Costs { get; set; } = new();
 
-    [JsonPropertyName("dati_bolla")]
-    public DatiBolla DatiBolla { get; set; } = new();
+    [JsonPropertyName("document")]
+    public DatiBolla Document { get; set; } = new();
 }
 
 public class Costs

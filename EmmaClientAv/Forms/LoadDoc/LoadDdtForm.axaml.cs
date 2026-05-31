@@ -154,7 +154,7 @@ public partial class LoadDdtForm : Window
                 // Opzionale: Ripristina lo stile del testo (se vuoi togliere l'italico/grigio iniziale)
                 LblNomeFile.FontStyle = Avalonia.Media.FontStyle.Normal;
                 LblNomeFile.Foreground = Avalonia.Media.Brushes.Black;
-
+                
                 ApriPdfEsterno(absolutePath);
             }
             catch (Exception ex)
@@ -163,6 +163,7 @@ public partial class LoadDdtForm : Window
             }
             finally
             {
+                
                 mainWindow.Cursor = Cursor.Default; 
             }
                 
@@ -176,45 +177,50 @@ public partial class LoadDdtForm : Window
     /// <returns></returns>
     private async Task<DatiBolla?> InviaFileAllApiAsync(IStorageFile file)
     {
-        string urlApi = $"{App.CurrentApp.EMMMA_ENDPOINT}/api/doc/ddt";
+        string urlApi = $"{App.CurrentApp.EMMMA_ENDPOINT}/api/v1/doc/ddt";
+        string model = "AZURE-OPENAI";
 
         using var client = new HttpClient();
         using var content = new MultipartFormDataContent();
-
-        try
-        {
-            // 1. Apriamo lo stream del file in lettura
-            await using var fileStream = await file.OpenReadAsync();
-            using var streamContent = new StreamContent(fileStream);
-
-            // 2. Impostiamo l'header del tipo di contenuto (opzionale, ma consigliato)
-            streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-
-            // 3. Il nome del parametro ("file") DEVE corrispondere esattamente 
-            // al nome della variabile nell'API Python: `file: UploadFile`
-            content.Add(streamContent, "file", file.Name);
-
-            // 4. Eseguiamo la chiamata POST in modo asincrono
-            HttpResponseMessage response = await client.PostAsync(urlApi, content);
-
-            // 5. Verifichiamo l'esito
-            if (response.IsSuccessStatusCode)
-            {
-                await using var responseStream = await response.Content.ReadAsStreamAsync();
-                return await JsonSerializer.DeserializeAsync<DatiBolla>(responseStream);
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine($"Errore API: {response.StatusCode}");
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Errore durante l'invio: {ex.Message}");
-        }
         
-        return null;
+        // 1. Apriamo lo stream del file in lettura
+        await using var fileStream = await file.OpenReadAsync();
+        using var streamContent = new StreamContent(fileStream);
+
+        // 2. Impostiamo l'header del tipo di contenuto (opzionale, ma consigliato)
+        streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+
+        // 3. Il nome del parametro ("file") DEVE corrispondere esattamente 
+        // al nome della variabile nell'API Python: `file: UploadFile`
+        content.Add(streamContent, "file", file.Name);
+
+        // --- MODIFICA QUI: Creiamo l'oggetto HttpRequestMessage ---
+        using var request = new HttpRequestMessage(HttpMethod.Post, urlApi);
+
+        // Configura il contenuto (il file multipart)
+        request.Content = content;
+
+        // Aggiungi l'header personalizzato (puoi usare "OPENAI" o "GEMINI")
+        request.Headers.Add("x-model", model); 
+        request.Headers.Add("X-API-Key", "");
+        // ---------------------------------------------------------
+        
+        // 4. Eseguiamo la chiamata POST in modo asincrono
+        HttpResponseMessage response = await client.SendAsync(request);
+        
+        // 5. Verifichiamo l'esito
+        if (response.IsSuccessStatusCode)
+        {
+            await using var responseStream = await response.Content.ReadAsStreamAsync();
+            DdtResponse? r =  await JsonSerializer.DeserializeAsync<DdtResponse>(responseStream);
+            return r?.Document;
+        }
+        else
+        {
+            throw new Exception($"Errore durante l'invio: {response.StatusCode} {response.Content}");
+        }
     }
+    
 
     /// <summary>
     /// 
