@@ -18,4 +18,8 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\EMMA-SERVER\EmmaServer.Entities\EmmaServer.Entities.csproj" />
+    </ItemGroup>
 </Project>

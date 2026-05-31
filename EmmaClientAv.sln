@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmmaClientAv", "EmmaClientAv\EmmaClientAv.csproj", "{F36AE1C5-D1F7-44D0-97DD-A4B8CA3B56F1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmmaServer.Entities", "..\EMMA-SERVER\EmmaServer.Entities\EmmaServer.Entities.csproj", "{79C506ED-8127-4E79-95DC-B9D7EE3F7817}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{F36AE1C5-D1F7-44D0-97DD-A4B8CA3B56F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F36AE1C5-D1F7-44D0-97DD-A4B8CA3B56F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F36AE1C5-D1F7-44D0-97DD-A4B8CA3B56F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79C506ED-8127-4E79-95DC-B9D7EE3F7817}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79C506ED-8127-4E79-95DC-B9D7EE3F7817}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79C506ED-8127-4E79-95DC-B9D7EE3F7817}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79C506ED-8127-4E79-95DC-B9D7EE3F7817}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

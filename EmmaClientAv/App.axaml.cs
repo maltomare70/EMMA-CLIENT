@@ -10,8 +10,9 @@ public partial class App : Application
     
     // La tua variabile globale
     //public string EMMMA_ENDPOINT { get; set; } = "https://emma-aegc.onrender.com";
-    public string EMMMA_ENDPOINT { get; set; } = "http://localhost:8000";
-     
+    public string EMMMA_ENDPOINT { get; set; } = "http://localhost:9000";
+    public string EMMMA_USER { get; set; } = "marco@emma.it";
+    public string EMMMA_PASSWORD { get; set; } = "password";
     
     // Helper statico per un accesso rapido
     public static App CurrentApp => (App)Application.Current!;

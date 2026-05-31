@@ -3,7 +3,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using EmmaClientAv.Helpers;
-using EmmaClientAv.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -13,8 +12,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
-
-
+using System.Text;
+using EmmaServer.Entities;
+    
 namespace EmmaClientAv.Forms.LoadDoc;
 
 public partial class LoadDdtForm : Window
@@ -201,9 +201,19 @@ public partial class LoadDdtForm : Window
         request.Content = content;
 
         // Aggiungi l'header personalizzato (puoi usare "OPENAI" o "GEMINI")
-        request.Headers.Add("x-model", model); 
-        request.Headers.Add("X-API-Key", "");
+        // request.Headers.Add("x-model", model); 
+        // request.Headers.Add("X-API-Key", "");
         // ---------------------------------------------------------
+
+        string username = App.CurrentApp.EMMMA_USER;
+        string password = App.CurrentApp.EMMMA_PASSWORD;
+
+        // Codifica "username:password" in Base64
+        var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
+
+        // Aggiungi l'header Authorization nel formato "Basic [Token]"
+        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+
         
         // 4. Eseguiamo la chiamata POST in modo asincrono
         HttpResponseMessage response = await client.SendAsync(request);
