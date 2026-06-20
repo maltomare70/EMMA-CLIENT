@@ -17,18 +17,13 @@ public partial class MainWindow : Window
         {
             switch (bottonePremuto.Name)
             {
-                case "BtnDdt":
+
+                case "BtnFattura":
                     var loadFormsDDT = new LoadDdtForm();
                     loadFormsDDT.WindowState = WindowState.Maximized;
                     loadFormsDDT.Show();
                     break;
                 
-                case "BtnOrdine": 
-                    break;
-                
-                case "BtnFattura":
-                    // Apri form Fatture
-                    break;
 
                 case "BtnConciliazione":
                     // Apri form Conciliazione

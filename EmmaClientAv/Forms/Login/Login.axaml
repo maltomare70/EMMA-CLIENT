@@ -2,8 +2,33 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
         x:Class="EmmaClientAv.Forms.Login.Login"
-        Title="Login">
-    Welcome to Avalonia!
+        Title="Login"
+        Width="350" Height="250"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+        <StackPanel Spacing="15" Width="250">
+            
+            <TextBlock Text="Accedi" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+
+            <StackPanel Spacing="5">
+                <TextBlock Text="Utente:" />
+                <TextBox Name="TxtUser" Watermark="Inserisci l'utente"/>
+            </StackPanel>
+
+            <StackPanel Spacing="5">
+                <TextBlock Text="Password:" />
+                <TextBox Name="TxtPassword" PasswordChar="*" Watermark="Inserisci la password"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                <Button Name="BtnOk" Padding="12,8" CornerRadius="4" Background="DodgerBlue"  Foreground="White" Content="OK" Width="80" HorizontalContentAlignment="Center"/>
+                <Button Name="BtnCancel" Padding="12,8" CornerRadius="4"  Background="#F44336" Foreground="White" Content="Annulla" Width="80" HorizontalContentAlignment="Center"/>
+            </StackPanel>
+
+        </StackPanel>
+    </Grid>
 </Window>
+

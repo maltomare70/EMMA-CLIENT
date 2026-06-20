@@ -177,8 +177,7 @@ public partial class LoadDdtForm : Window
     /// <returns></returns>
     private async Task<DatiBolla?> InviaFileAllApiAsync(IStorageFile file)
     {
-        string urlApi = $"{App.CurrentApp.EMMMA_ENDPOINT}/api/v1/doc/ddt";
-        string model = "AZURE-OPENAI";
+        string urlApi = $"{App.Config.ServerUrl}/api/v1/doc";
 
         using var client = new HttpClient();
         using var content = new MultipartFormDataContent();
