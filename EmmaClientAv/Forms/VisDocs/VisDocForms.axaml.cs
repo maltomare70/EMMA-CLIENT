@@ -43,9 +43,99 @@ public partial class VisDocForms : Window
             RoutingStrategies.Tunnel, 
             handledEventsToo: true
         );
+
+        DataGridArticoli.AddHandler(InputElement.LostFocusEvent, OnElementLostFocus, RoutingStrategies.Bubble);
+    }
+
+    
+    private async void EliminaRiga_Click(object? sender, RoutedEventArgs e)
+    {
+        // 1. Identifichiamo il bottone che è stato cliccato
+        if (sender is Button bottone && bottone.DataContext is RigheDocumento rigaDaEliminare)
+        {
+            // 2. Chiamata all'API per notificare l'eliminazione
+            bool apiSuccess = await InviaEliminazioneAllApi(rigaDaEliminare);
+
+            if (apiSuccess)
+            {
+                // 3. Troviamo la lista dei dettagli per rimuovere la riga dalla UI.
+                // Per farlo, cerchiamo il MasterDocumento risalendo l'albero visivo o tramite il parent.
+                if (bottone.FindAncestorOfType<DataGrid>()?.DataContext is MasterDocumento master)
+                {
+                    // Rimuove l'elemento dalla lista (Funziona al meglio se Dettagli è una ObservableCollection)
+                    //master.Dettagli.Remove(rigaDaEliminare);
+
+                    
+                    await CaricaDati();
+  
+                }
+            }
+        }
     }
     
+    private async Task<bool> InviaEliminazioneAllApi(RigheDocumento riga)
+    {
+        try
+        {
+            //TODO delete riga
+            return true; // Ritorna true se andato a buon fine
+        }
+        catch
+        {
+            return false;
+        }
+    }
     
+    private async void OnElementLostFocus(object? sender, RoutedEventArgs e)
+    {
+        // Verifichiamo se l'elemento che ha perso il focus fa parte di una riga di dettaglio
+        if (e.Source is Control visualElement && visualElement.DataContext is RigheDocumento rigaModificata)
+        {
+            // Invia all'API
+            await InviaModificaAllApi(rigaModificata);
+        }
+    }
+    
+    private async Task InviaModificaAllApi(RigheDocumento riga)
+    {
+        try
+        {
+            var articoloBolla = new ArticoloBolla();
+            articoloBolla.Id_Master = riga.IdMaster;
+            articoloBolla.Id_Riga = riga.IdRiga;
+            articoloBolla.Quantita = riga.Qta;
+            articoloBolla.Descrizione = riga.DescrizioneArticolo;
+            articoloBolla.Codice = riga.CodiceArticolo;
+            articoloBolla.Imponibile = riga.Imponibile;
+            articoloBolla.Totale = riga.Totale;
+            articoloBolla.UnitaMisura = riga.UnitaMisura;
+            articoloBolla.Iva = riga.IVA;
+            
+            string urlApi = $"{App.Config.ServerUrl}/api/v1/doc/riga";
+            using var client = new HttpClient();
+            using var request = new HttpRequestMessage(HttpMethod.Put, urlApi);
+            var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
+            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+            
+            request.Content = JsonContent.Create(articoloBolla);
+            HttpResponseMessage response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                //
+            }
+            else
+            {
+                throw new Exception($"Errore durante l'invio: {response.StatusCode} {response.Content}");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Gestisci l'errore di rete (es. API offline)
+            System.Diagnostics.Debug.WriteLine($"Errore di rete: {ex.Message}");
+        }
+    }
+
+
     private async void Window_OnOpened(object? sender, EventArgs e)
     {
         try
@@ -132,6 +222,8 @@ public partial class VisDocForms : Window
             {
                 dettagli.Add((new RigheDocumento()
                 {
+                    IdRiga = articolo.Id_Riga,
+                    IdMaster = articolo.Id_Master,
                     CodiceArticolo  = articolo.Codice,
                     DescrizioneArticolo = articolo.Descrizione,
                     Qta = articolo.Quantita,
@@ -146,10 +238,23 @@ public partial class VisDocForms : Window
             sampleData.Add(master); 
         }
 
-        DataGridArticoli.ItemsSource = sampleData;
+        DataGridArticoli.ItemsSource = sampleData.OrderBy((x=>x.Fornitore))
+            .ThenBy(u => u.DataDocumento)
+            .ThenBy(u => u.NumeroDocumento)
+            .ToList();
     }
 
     private async void Button_OnClick(object? sender, RoutedEventArgs e)
+    {
+        await CaricaDati();
+    }
+    
+    private async void Button_OnClick_2(object? sender, RoutedEventArgs e)
+    {
+        await CaricaDati();
+    }
+
+    private async Task CaricaDati()
     {
         if ( CbTipoDocumento.SelectedIndex < 0) return;
         var tipoDoc = CbTipoDocumento.SelectedIndex + 1;
@@ -189,4 +294,6 @@ public partial class VisDocForms : Window
             }
         }
     }
+
+
 }

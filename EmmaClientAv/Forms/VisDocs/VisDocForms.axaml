@@ -61,6 +61,9 @@
                                   PlaceholderText="Seleziona Stato..."/>
                     </StackPanel>
                     
+                    
+                  
+                    
                 </StackPanel>
             </Grid>
         </Border>
@@ -73,7 +76,8 @@
                   IsReadOnly="True"
                   GridLinesVisibility="All"
                   BorderThickness="1"
-                  BorderBrush="#D0D0D0">
+                  BorderBrush="#D0D0D0"
+                 >
 
             
             <DataGrid.Columns>
@@ -82,26 +86,114 @@
                 <DataGridTextColumn Header="N° Documento" FontWeight="Bold" Binding="{Binding NumeroDocumento}" Width="150"/>
                 <DataGridTextColumn Header="Data Documento" FontWeight="Bold" Binding="{Binding DataDocumento}" Width="150"/>
                 <DataGridTextColumn Header="Stato Documento" FontWeight="Bold" Binding="{Binding StatoDocumento}" Width="150"/>
+                
+                <DataGridTemplateColumn Header="Azioni" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="Chiudi" 
+                                    Background="Red" 
+                                    Foreground="White"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Padding="10,5"
+                                    Click="Button_OnClick_2"
+                                     /> </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
 
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate x:DataType="entities:MasterDocumento">
                     <Border Background="#F5F5F5" CornerRadius="4" Padding="15" Margin="5">
                         <StackPanel>
-                            <DataGrid ItemsSource="{Binding Dettagli}"
+                            <DataGrid 
+                                ItemsSource="{Binding Dettagli}"
                                       AutoGenerateColumns="False"
                                       IsReadOnly="False" 
                                       GridLinesVisibility="All"
                                       BorderThickness="1"
                                       BorderBrush="#CCCCCC">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Codice" Binding="{Binding CodiceArticolo}" Width="200"/>
-                                    <DataGridTextColumn Header="Descrizione" Binding="{Binding DescrizioneArticolo}" Width="*"/>
-                                    <DataGridTextColumn Header="U.M." Binding="{Binding UnitaMisura}" Width="100"/>
-                                    <DataGridTextColumn Header="Q.tà" Binding="{Binding Qta}" Width="150"/>
-                                    <DataGridTextColumn Header="Imponibile" Binding="{Binding Imponibile}" Width="150"/>
-                                    <DataGridTextColumn Header="IVA" Binding="{Binding IVA}" Width="100"/>
-                                    <DataGridTextColumn Header="Totale" Binding="{Binding Totale}" Width="150"/>
+                                    <DataGridTextColumn Header="Codice" Binding="{Binding CodiceArticolo}" IsReadOnly="False" Width="200"/>
+                                    <DataGridTextColumn Header="Descrizione" Binding="{Binding DescrizioneArticolo}" IsReadOnly="False" Width="*"/>
+                                    <DataGridTextColumn Header="U.M." Binding="{Binding UnitaMisura}" Width="100" IsReadOnly="False" />
+                                    
+                                    <DataGridTemplateColumn Header="Q.tà" Width="150" >
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Qta}" 
+                                                           HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,10,0"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <NumericUpDown Value="{Binding Qta}" 
+                                                               HorizontalContentAlignment="Right"
+                                                               FormatString="0" 
+                                                               ShowButtonSpinner="True" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
+                                    
+                                    
+                                    <DataGridTemplateColumn Header="Imponibile" Width="150" >
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Imponibile}" 
+                                                           HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,10,0"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <NumericUpDown Value="{Binding Imponibile}" 
+                                                               HorizontalContentAlignment="Right"
+                                                               FormatString="0" 
+                                                               ShowButtonSpinner="True" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
+                                    
+                                    
+                                    <DataGridTextColumn Header="IVA" Binding="{Binding IVA}" IsReadOnly="False" Width="100"/>
+                    
+                                    
+                                    <DataGridTemplateColumn Header="Totale" Width="150" >
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Totale}" 
+                                                           HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,10,0"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <NumericUpDown Value="{Binding Totale}" 
+                                                               HorizontalContentAlignment="Right"
+                                                               FormatString="0" 
+                                                               ShowButtonSpinner="True" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
+                                    
+                                    <DataGridTemplateColumn Width="100">
+                                        <DataTemplate>
+                                            <Button Content="Elimina" 
+                                                    Background="#FF4D4D" 
+                                                    Foreground="White"
+                                                    Padding="5,2"
+                                                    HorizontalAlignment="Center"
+                                                    Click="EliminaRiga_Click"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn>
+                                    
                                 </DataGrid.Columns>
                             </DataGrid>
                         </StackPanel>
