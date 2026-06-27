@@ -21,6 +21,10 @@ public partial class Login : Window
 
         BtnOk.Click += BtnOk_Click;
         BtnCancel.Click += BtnCancel_Click;
+
+
+        TxtUser.Text = "maltomare70@gmail.com";
+        TxtPassword.Text = "nocafla";
     }
 
     async Task<bool> IfLoginSucceded(string user, string password)
@@ -88,7 +92,7 @@ public partial class Login : Window
                     {
                         // Instanziamo la finestra principale (es. MainWindow)
                         var mainWindow = new MainWindow(); 
-                        
+                        mainWindow.WindowState = WindowState.Maximized;
                         // Impostiamo la MainWindow dell'applicazione sulla nuova finestra
                         desktop.MainWindow = mainWindow;
                         

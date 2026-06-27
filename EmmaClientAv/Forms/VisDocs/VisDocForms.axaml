@@ -1,0 +1,113 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:entities="clr-namespace:EmmaServer.Entities;assembly=EmmaServer.Entities"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="EmmaClientAv.Forms.VisDocs.VisDocForms"
+        Opened="Window_OnOpened"
+        Title="VisDocForms">
+
+    <Grid RowDefinitions="Auto, *" Margin="15">
+         
+        <Border Grid.Row="0"
+                Background="#F9F9F9"
+                BorderBrush="#E0E0E0"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="12"
+                Margin="0,0,0,15">
+    
+            <Grid ColumnDefinitions="*, Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="20" VerticalAlignment="Center">
+                    
+                    <Button Click="Button_OnClick"
+                            Background="#2196F3"
+                            Foreground="White"
+                            Padding="15,8"
+                            FontWeight="SemiBold"
+                            CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="📁" VerticalAlignment="Center"/>
+                            <TextBlock Text="Carica Documenti ..." VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Border Width="1" Height="25" Background="#E0E0E0"/>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <Label Content="Tipo Documento:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#333333"/>
+                        <ComboBox Name="CbTipoDocumento" 
+                                  Width="200" 
+                                  PlaceholderText="Seleziona Tipo..."/>
+                    </StackPanel>
+                    
+                    <Border Width="1" Height="25" Background="#E0E0E0"/>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <Label Content="Fornitore:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#333333"/>
+                        <ComboBox Name="CbFornitore"   x:DataType="entities:EmmaFornitori"
+                                  Width="400" 
+                                  DisplayMemberBinding="{Binding descrizione}"
+                                  PlaceholderText="Seleziona Fornitore..."/>
+                    </StackPanel>
+                    
+                    <Border Width="1" Height="25" Background="#E0E0E0"/>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <Label Content="Stato Documento:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#333333"/>
+                        <ComboBox Name="CbStatoDocumento" 
+                                  Width="200" 
+                                  PlaceholderText="Seleziona Stato..."/>
+                    </StackPanel>
+                    
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <DataGrid Grid.Row="1" 
+                  RowDetailsVisibilityMode="VisibleWhenSelected" 
+                  Name="DataGridArticoli"
+                  x:DataType="entities:MasterDocumento"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  GridLinesVisibility="All"
+                  BorderThickness="1"
+                  BorderBrush="#D0D0D0">
+
+            
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Fornitore" FontWeight="Bold" Binding="{Binding Fornitore}" Width="*"/>
+                <DataGridTextColumn Header="Tipo Documento" FontWeight="Bold" Binding="{Binding TipDocumento}" Width="150"/>
+                <DataGridTextColumn Header="N° Documento" FontWeight="Bold" Binding="{Binding NumeroDocumento}" Width="150"/>
+                <DataGridTextColumn Header="Data Documento" FontWeight="Bold" Binding="{Binding DataDocumento}" Width="150"/>
+                <DataGridTextColumn Header="Stato Documento" FontWeight="Bold" Binding="{Binding StatoDocumento}" Width="150"/>
+            </DataGrid.Columns>
+
+            <DataGrid.RowDetailsTemplate>
+                <DataTemplate x:DataType="entities:MasterDocumento">
+                    <Border Background="#F5F5F5" CornerRadius="4" Padding="15" Margin="5">
+                        <StackPanel>
+                            <DataGrid ItemsSource="{Binding Dettagli}"
+                                      AutoGenerateColumns="False"
+                                      IsReadOnly="False" 
+                                      GridLinesVisibility="All"
+                                      BorderThickness="1"
+                                      BorderBrush="#CCCCCC">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Codice" Binding="{Binding CodiceArticolo}" Width="200"/>
+                                    <DataGridTextColumn Header="Descrizione" Binding="{Binding DescrizioneArticolo}" Width="*"/>
+                                    <DataGridTextColumn Header="U.M." Binding="{Binding UnitaMisura}" Width="100"/>
+                                    <DataGridTextColumn Header="Q.tà" Binding="{Binding Qta}" Width="150"/>
+                                    <DataGridTextColumn Header="Imponibile" Binding="{Binding Imponibile}" Width="150"/>
+                                    <DataGridTextColumn Header="IVA" Binding="{Binding IVA}" Width="100"/>
+                                    <DataGridTextColumn Header="Totale" Binding="{Binding Totale}" Width="150"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </DataGrid.RowDetailsTemplate>
+        </DataGrid>
+    </Grid>
+</Window>

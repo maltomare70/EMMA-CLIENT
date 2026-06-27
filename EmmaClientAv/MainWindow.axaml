@@ -35,6 +35,14 @@
                 </StackPanel>
             </Button>
 
+            <Button Name="BtnVisualizza" Width="180" Height="180" Margin="12" Click="Button_OnClick"
+                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+                    <TextBlock Text="🌐" FontSize="42" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Visualizza Documenti" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
             <!-- ================= RIGA 2: GESTIONE E STRUMENTI ================= -->
 
             <!-- CARD 4: CONCILIAZIONE -->

@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using EmmaClientAv.Forms.LoadDoc;
+using EmmaClientAv.Forms.VisDocs;
 
 namespace EmmaClientAv;
 
@@ -24,6 +25,11 @@ public partial class MainWindow : Window
                     loadFormsDDT.Show();
                     break;
                 
+                case "BtnVisualizza":
+                    var visDocForms = new VisDocForms();
+                    visDocForms.WindowState = WindowState.Maximized;
+                    visDocForms.Show();
+                    break;
 
                 case "BtnConciliazione":
                     // Apri form Conciliazione
