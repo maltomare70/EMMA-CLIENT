@@ -14,7 +14,8 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Text;
 using EmmaServer.Entities;
-    
+using System.Net.Http.Json;
+  
 namespace EmmaClientAv.Forms.LoadDoc;
 
 public partial class LoadDdtForm : Window
@@ -220,9 +221,15 @@ public partial class LoadDdtForm : Window
         // 5. Verifichiamo l'esito
         if (response.IsSuccessStatusCode)
         {
+            var ddt = await response.Content.ReadFromJsonAsync<DocResponse>().ConfigureAwait(false);
+            return ddt?.DdtResponse?.Document;
+            
             await using var responseStream = await response.Content.ReadAsStreamAsync();
-            DdtResponse? r =  await JsonSerializer.DeserializeAsync<DdtResponse>(responseStream);
-            return r?.Document;
+            //DocResponse docResponse = await JsonSerializer.DeserializeAsync<DocResponse>(responseStream);
+            //var docId = docResponse.DocId;
+            //DdtResponse? ddt = docResponse.DdtResponse;
+            //DdtResponse? ddt =  await JsonSerializer.DeserializeAsync<DdtResponse>(responseStream);
+            //return ddt?.Document;
         }
         else
         {

@@ -50,27 +50,6 @@ public partial class VisDocForms : Window
         DataGridArticoli.AddHandler(InputElement.LostFocusEvent, OnElementLostFocus, RoutingStrategies.Bubble);
     }
     
-    // private void OnDataGridTemplateClick(object? sender, RoutedEventArgs e)
-    // {
-    //     if (e.Source is Button btn && btn.Name == "BtnAggiungiArticolo")
-    //     {
-    //         // Essendo dentro il DataTemplate, il DataContext del pulsante è automaticamente il MasterDocumento corrente
-    //         if (btn.DataContext is MasterDocumento master)
-    //         {
-    //             master.Dettagli?.Add(new RigheDocumento()
-    //             {
-    //                 CodiceArticolo = "NUOVO",
-    //                 DescrizioneArticolo = "Nuovo Articolo",
-    //                 UnitaMisura = "PZ",
-    //                 Qta = 1,
-    //                 Imponibile = 0,
-    //                 IVA = "22",
-    //                 Totale = 0
-    //             });
-    //         }
-    //     }
-    // }
-    
     //Pulsante Elimina Riga / Aggiunta Riga
     private async void EliminaRiga_Click(object? sender, RoutedEventArgs e)
     {
@@ -128,9 +107,9 @@ public partial class VisDocForms : Window
             }
             else
             {
-                throw new Exception($"Errore durante l'invio: {response.StatusCode} {response.Content}");
+                //throw new Exception($"Errore durante l'invio: {response.StatusCode} {response.Content}");
+                return false;
             }
-            
         }
         catch
         {
@@ -143,8 +122,34 @@ public partial class VisDocForms : Window
     {
         try
         {
-            //TODO delete riga
-            return true; // Ritorna true se andato a buon fine
+            var articoloBolla = new ArticoloBolla();
+            articoloBolla.Id_Master = riga.IdMaster;
+            articoloBolla.Id_Riga = riga.IdRiga;
+            articoloBolla.Quantita = riga.Qta;
+            articoloBolla.Descrizione = riga.DescrizioneArticolo;
+            articoloBolla.Codice = riga.CodiceArticolo;
+            articoloBolla.Imponibile = riga.Imponibile;
+            articoloBolla.Totale = riga.Totale;
+            articoloBolla.UnitaMisura = riga.UnitaMisura;
+            articoloBolla.Iva = riga.IVA;
+        
+            string urlApi = $"{App.Config.ServerUrl}/api/v1/doc/riga";
+            using var client = new HttpClient();
+            using var request = new HttpRequestMessage(HttpMethod.Delete, urlApi);
+            var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
+            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+        
+            request.Content = JsonContent.Create(articoloBolla);
+            HttpResponseMessage response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+                //throw new Exception($"Errore durante l'invio: {response.StatusCode} {response.Content}");
+            }
         }
         catch
         {
@@ -192,7 +197,7 @@ public partial class VisDocForms : Window
             }
             else
             {
-                throw new Exception($"Errore durante l'invio: {response.StatusCode} {response.Content}");
+                //throw new Exception($"Errore durante l'invio: {response.StatusCode} {response.Content}");
             }
         }
         catch (Exception ex)
@@ -240,7 +245,8 @@ public partial class VisDocForms : Window
         }
         else
         {
-            throw new Exception($"Errore durante l'invio: {response.StatusCode} {response.Content}");
+            return new List<EmmaFornitori>();
+            //throw new Exception($"Errore durante l'invio: {response.StatusCode} {response.Content}");
         }
     }
     
@@ -261,7 +267,8 @@ public partial class VisDocForms : Window
         }
         else
         {
-            throw new Exception($"Errore durante l'invio: {response.StatusCode} {response.Content}");
+            //throw new Exception($"Errore durante l'invio: {response.StatusCode} {response.Content}");
+            return new List<EmmaDoc>();
         }
     }
 
