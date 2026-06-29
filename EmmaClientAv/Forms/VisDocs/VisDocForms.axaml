@@ -93,7 +93,7 @@
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
                                     Padding="10,5"
-                                    Click="Button_OnClick_2"
+                                    Click="Button_OnCambioStato"
                             /> 
                             
                             

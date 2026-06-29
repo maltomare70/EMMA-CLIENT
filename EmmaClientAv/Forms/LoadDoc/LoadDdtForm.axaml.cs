@@ -223,13 +223,6 @@ public partial class LoadDdtForm : Window
         {
             var ddt = await response.Content.ReadFromJsonAsync<DocResponse>().ConfigureAwait(false);
             return ddt?.DdtResponse?.Document;
-            
-            await using var responseStream = await response.Content.ReadAsStreamAsync();
-            //DocResponse docResponse = await JsonSerializer.DeserializeAsync<DocResponse>(responseStream);
-            //var docId = docResponse.DocId;
-            //DdtResponse? ddt = docResponse.DdtResponse;
-            //DdtResponse? ddt =  await JsonSerializer.DeserializeAsync<DdtResponse>(responseStream);
-            //return ddt?.Document;
         }
         else
         {
@@ -294,6 +287,6 @@ public partial class LoadDdtForm : Window
 
     private void Button_SaveOnClick(object? sender, RoutedEventArgs e)
     {
-        throw new NotImplementedException();
+        //
     }
 }
