@@ -27,15 +27,15 @@
             <!-- ================= RIGA 1: OPERAZIONI DI CARICAMENTO ================= -->
             
             <!-- CARICA FATTURA -->
-            <Button Name="BtnFattura" Width="180" Height="180" Margin="12" Click="Button_OnClick"
+            <Button Name="BtnFattura" Width="200" Height="200" Margin="12" Click="Button_OnClick"
                     Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
                     <TextBlock Text="📄" FontSize="42" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Carica Fattura" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Carica Documento" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
                 </StackPanel>
             </Button>
 
-            <Button Name="BtnVisualizza" Width="180" Height="180" Margin="12" Click="Button_OnClick"
+            <Button Name="BtnVisualizza" Width="200" Height="200" Margin="12" Click="Button_OnClick"
                     Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
                     <TextBlock Text="🌐" FontSize="42" HorizontalAlignment="Center"/>

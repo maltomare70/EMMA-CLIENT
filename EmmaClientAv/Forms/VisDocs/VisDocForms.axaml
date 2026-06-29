@@ -6,6 +6,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="EmmaClientAv.Forms.VisDocs.VisDocForms"
         Opened="Window_OnOpened"
+        x:Name="RootWindow"
         Title="VisDocForms">
 
     <Grid RowDefinitions="Auto, *" Margin="15">
@@ -29,7 +30,7 @@
                             CornerRadius="4">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <TextBlock Text="📁" VerticalAlignment="Center"/>
-                            <TextBlock Text="Carica Documenti ..." VerticalAlignment="Center"/>
+                            <TextBlock Text="Mostra Documenti ..." VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     
@@ -60,10 +61,6 @@
                                   Width="200" 
                                   PlaceholderText="Seleziona Stato..."/>
                     </StackPanel>
-                    
-                    
-                  
-                    
                 </StackPanel>
             </Grid>
         </Border>
@@ -89,15 +86,18 @@
                 
                 <DataGridTemplateColumn Header="Azioni" Width="100">
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Content="Chiudi" 
-                                    Background="Red" 
+                        <DataTemplate x:DataType="entities:MasterDocumento">
+                            <Button Content="{Binding TestoBottone}"
+                                    Background="#2196F3"
                                     Foreground="White"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
                                     Padding="10,5"
                                     Click="Button_OnClick_2"
-                                     /> </DataTemplate>
+                            /> 
+                            
+                            
+                        </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
@@ -184,18 +184,30 @@
                                     </DataGridTemplateColumn>
                                     
                                     <DataGridTemplateColumn Width="100">
-                                        <DataTemplate>
-                                            <Button Content="Elimina" 
+                                        <DataTemplate x:DataType="entities:RigheDocumento">
+                                            <Button Content="{Binding TestoBottone}" 
                                                     Background="#FF4D4D" 
                                                     Foreground="White"
                                                     Padding="5,2"
                                                     HorizontalAlignment="Center"
-                                                    Click="EliminaRiga_Click"/>
+                                                    Click="EliminaRiga_Click">
+                        
+                                            </Button>
                                         </DataTemplate>
                                     </DataGridTemplateColumn>
                                     
                                 </DataGrid.Columns>
                             </DataGrid>
+                            
+                            <Button Content="+ Aggiungi Articolo"
+                                    Name="BtnAggiungiArticolo"
+                                    Background="#4CAF50"
+                                    Foreground="White"
+                                    Margin="0,10,0,0"
+                                    HorizontalAlignment="Left"
+                                    Tag="additem"
+                                    />
+                            
                         </StackPanel>
                     </Border>
                 </DataTemplate>

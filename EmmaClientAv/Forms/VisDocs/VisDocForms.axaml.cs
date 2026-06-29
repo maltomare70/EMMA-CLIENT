@@ -17,11 +17,14 @@ using EmmaServer.Entities;
 using System.Text.Json;
 using Avalonia.Input;
 using Avalonia.VisualTree;
-
+using System.Collections.ObjectModel;
+using Avalonia.Media;
 namespace EmmaClientAv.Forms.VisDocs;
 
 public partial class VisDocForms : Window
 {
+    public ObservableCollection<MasterDocumento> DocumentiInGriglia { get; set; } = new();
+    
     public VisDocForms()
     {
         InitializeComponent();
@@ -46,33 +49,96 @@ public partial class VisDocForms : Window
 
         DataGridArticoli.AddHandler(InputElement.LostFocusEvent, OnElementLostFocus, RoutingStrategies.Bubble);
     }
-
     
+    // private void OnDataGridTemplateClick(object? sender, RoutedEventArgs e)
+    // {
+    //     if (e.Source is Button btn && btn.Name == "BtnAggiungiArticolo")
+    //     {
+    //         // Essendo dentro il DataTemplate, il DataContext del pulsante è automaticamente il MasterDocumento corrente
+    //         if (btn.DataContext is MasterDocumento master)
+    //         {
+    //             master.Dettagli?.Add(new RigheDocumento()
+    //             {
+    //                 CodiceArticolo = "NUOVO",
+    //                 DescrizioneArticolo = "Nuovo Articolo",
+    //                 UnitaMisura = "PZ",
+    //                 Qta = 1,
+    //                 Imponibile = 0,
+    //                 IVA = "22",
+    //                 Totale = 0
+    //             });
+    //         }
+    //     }
+    // }
+    
+    //Pulsante Elimina Riga / Aggiunta Riga
     private async void EliminaRiga_Click(object? sender, RoutedEventArgs e)
     {
-        // 1. Identifichiamo il bottone che è stato cliccato
-        if (sender is Button bottone && bottone.DataContext is RigheDocumento rigaDaEliminare)
+        if (sender is Button bottone && bottone.DataContext is RigheDocumento riga)
         {
+            bottone.Background = Brush.Parse("#4CAF50");
+            
             // 2. Chiamata all'API per notificare l'eliminazione
-            bool apiSuccess = await InviaEliminazioneAllApi(rigaDaEliminare);
+            bool apiSuccess = false;
 
-            if (apiSuccess)
+            if (bottone.Content.ToString().ToLower() == "aggiungi")
             {
-                // 3. Troviamo la lista dei dettagli per rimuovere la riga dalla UI.
-                // Per farlo, cerchiamo il MasterDocumento risalendo l'albero visivo o tramite il parent.
-                if (bottone.FindAncestorOfType<DataGrid>()?.DataContext is MasterDocumento master)
+                _ = await InviaAddAllApi(riga);
+            }
+            else
+            {
+                apiSuccess = await InviaEliminazioneAllApi(riga);
+                if (apiSuccess && bottone.FindAncestorOfType<DataGrid>()?.DataContext is MasterDocumento master)
                 {
                     // Rimuove l'elemento dalla lista (Funziona al meglio se Dettagli è una ObservableCollection)
-                    //master.Dettagli.Remove(rigaDaEliminare);
-
-                    
-                    await CaricaDati();
-  
+                    master.Dettagli.Remove(riga);
                 }
             }
         }
     }
     
+    //Invia API per aggiunta nuova riga
+    private async Task<bool> InviaAddAllApi(RigheDocumento riga)
+    {
+        try
+        {
+
+            var articoloBolla = new ArticoloBolla();
+            articoloBolla.Id_Master = riga.IdMaster;
+            articoloBolla.Id_Riga = Guid.NewGuid().ToString();
+            articoloBolla.Quantita = riga.Qta;
+            articoloBolla.Descrizione = riga.DescrizioneArticolo;
+            articoloBolla.Codice = riga.CodiceArticolo;
+            articoloBolla.Imponibile = riga.Imponibile;
+            articoloBolla.Totale = riga.Totale;
+            articoloBolla.UnitaMisura = riga.UnitaMisura;
+            articoloBolla.Iva = riga.IVA;
+        
+            string urlApi = $"{App.Config.ServerUrl}/api/v1/doc/riga";
+            using var client = new HttpClient();
+            using var request = new HttpRequestMessage(HttpMethod.Post, urlApi);
+            var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
+            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+        
+            request.Content = JsonContent.Create(articoloBolla);
+            HttpResponseMessage response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                throw new Exception($"Errore durante l'invio: {response.StatusCode} {response.Content}");
+            }
+            
+        }
+        catch
+        {
+            return false;
+        }
+    }
+    
+    //Invia API per eliminazione riga
     private async Task<bool> InviaEliminazioneAllApi(RigheDocumento riga)
     {
         try
@@ -86,9 +152,9 @@ public partial class VisDocForms : Window
         }
     }
     
+    //Modfica valori di riga
     private async void OnElementLostFocus(object? sender, RoutedEventArgs e)
     {
-        // Verifichiamo se l'elemento che ha perso il focus fa parte di una riga di dettaglio
         if (e.Source is Control visualElement && visualElement.DataContext is RigheDocumento rigaModificata)
         {
             // Invia all'API
@@ -96,6 +162,7 @@ public partial class VisDocForms : Window
         }
     }
     
+    //Invia Riga Modificata al Server
     private async Task InviaModificaAllApi(RigheDocumento riga)
     {
         try
@@ -135,21 +202,17 @@ public partial class VisDocForms : Window
         }
     }
 
-
+    //per inserire nel combo un elemento nuovo
     private async void Window_OnOpened(object? sender, EventArgs e)
     {
         try
         {
             var fornitori = await GetFornitoriAsync();
-            
-            // Convertiamo in lista (se non lo è già) per poter usare .Insert()
             var listaFornitori = fornitori.ToList();
-
             // Inseriamo un elemento vuoto all'indice 0
             listaFornitori.Insert(0, new EmmaFornitori 
             { 
-                descrizione = string.Empty, // Oppure string.Empty o "-"
-                // Se la classe ha un ID (es. IdFornitore), puoi metterlo a 0 o null per riconoscerlo
+                descrizione = string.Empty,
             });
                 
             CbFornitore.ItemsSource = listaFornitori;
@@ -160,6 +223,8 @@ public partial class VisDocForms : Window
             System.Diagnostics.Debug.WriteLine($"Errore: {ex.Message}");
         }
     }
+    
+    //APi per acquisire Fornitori
     async Task<List<EmmaFornitori>> GetFornitoriAsync()
     {
         string urlApi = $"{App.Config.ServerUrl}/api/fornitori";
@@ -179,6 +244,7 @@ public partial class VisDocForms : Window
         }
     }
     
+    //API per acquisire docuemnti (filtrtati)
     async Task<List<EmmaDoc>> GetDocsAsync(EmmaDocFilters docFilters )
     {
         string urlApi = $"{App.Config.ServerUrl}/api/v1/doc";
@@ -198,26 +264,28 @@ public partial class VisDocForms : Window
             throw new Exception($"Errore durante l'invio: {response.StatusCode} {response.Content}");
         }
     }
-    
+
+    //Carico i dati nella Grid
     private void LoadDataGridData(List<EmmaDoc> docs)
     {
-        var sampleData = new List<MasterDocumento>();
+        List<MasterDocumento> sampleData = new List<MasterDocumento>();
         foreach (var emmaDoc in docs)
         {
-            var r =emmaDoc?.content?.Deserialize<DdtResponse>();
-            var doc = r?.Document;
+            var doc = emmaDoc?.ToDoc();
+            if ( doc is null ) continue;
             
             var master = new MasterDocumento()
             {
+                Id = doc.Id,
                 Fornitore = doc.Mittente, 
                 NumeroDocumento = doc.NumeroBolla, 
                 DataDocumento = doc.DataBolla,
-                StatoDocumento = "Aperto",
+                StatoDocumento = emmaDoc?.stato == 0 ? "Aperto" : "Chiuso",
                 TipDocumento = doc.TipoDocumento
                 
             };
 
-            List<RigheDocumento> dettagli = new List<RigheDocumento>();
+            ObservableCollection<RigheDocumento> dettagli = new ObservableCollection<RigheDocumento>();
             foreach (var articolo in doc.Articoli)
             {
                 dettagli.Add((new RigheDocumento()
@@ -238,22 +306,58 @@ public partial class VisDocForms : Window
             sampleData.Add(master); 
         }
 
-        DataGridArticoli.ItemsSource = sampleData.OrderBy((x=>x.Fornitore))
+        var datiOrdinati = sampleData.OrderBy((x=>x.Fornitore))
             .ThenBy(u => u.DataDocumento)
             .ThenBy(u => u.NumeroDocumento)
             .ToList();
-    }
+        
+        DocumentiInGriglia = new ObservableCollection<MasterDocumento>(datiOrdinati);
 
+        // 3. Assegniamo la ObservableCollection alla DataGrid
+        DataGridArticoli.ItemsSource = DocumentiInGriglia;
+    }
+    
+    //Evento per aggiungere una nuova Riga
+    private void AggiungiRiga_Click()
+    {
+        // 1. Recupera il Master attualmente selezionato nella DataGrid
+        if (DataGridArticoli.SelectedItem is MasterDocumento masterSelezionato)
+        {
+            // 2. Crea la nuova riga di dettaglio
+            var nuovaRiga = new RigheDocumento
+            {
+                IdRiga = "",
+                IdMaster = masterSelezionato.Id, // Se hai un ID di collegamento
+                CodiceArticolo = "",
+                DescrizioneArticolo = "",
+                UnitaMisura = "",
+                Qta = 0,
+                Imponibile = 0,
+                IVA =  "",
+                Totale = 0
+            };
+            
+            masterSelezionato.Dettagli.Add(nuovaRiga);
+        }
+        else
+        {
+            // Opzionale: avvisa l'utente che deve prima selezionare una riga Master
+        }
+    }
+    
+    //Mostra documenti
     private async void Button_OnClick(object? sender, RoutedEventArgs e)
     {
         await CaricaDati();
     }
     
+    //Aprire / Chiudere documento
     private async void Button_OnClick_2(object? sender, RoutedEventArgs e)
     {
         await CaricaDati();
     }
 
+    //Ricaricaricare i Dati
     private async Task CaricaDati()
     {
         if ( CbTipoDocumento.SelectedIndex < 0) return;
@@ -275,25 +379,32 @@ public partial class VisDocForms : Window
         LoadDataGridData(docs);
     }
 
+    //Per gestire l'apertura e Chiusura delle sezioni
     private void DataGridArticoli_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        // Cerchiamo se l'elemento cliccato (Source) è dentro una DataGridRow
-        var row = (e.Source as Visual)?.FindAncestorOfType<DataGridRow>();
+        // per gestire la cattura del click sul pulsante aggiungi tiga
+        // che l'evento click non riesce a catturare
+        if (e.Source is Visual visualSource)
+        {
+            var buttonAncestor = visualSource.FindAncestorOfType<Button>(includeSelf: true);
+        
+            if (buttonAncestor != null && buttonAncestor.Tag?.ToString() == "additem")
+            {
+                AggiungiRiga_Click();
+                
+                return; 
+            }
+        }
+        
 
+        var row = (e.Source as Visual)?.FindAncestorOfType<DataGridRow>();
         if (row != null)
         {
-            // Se la riga cliccata è già quella attualmente selezionata
             if (DataGridArticoli.SelectedItem == row.DataContext)
             {
-                // Deselezioniamo (questo chiude il dettaglio)
                 DataGridArticoli.SelectedItem = null;
-                
-                // Comunichiamo ad Avalonia che abbiamo gestito il click 
-                // evitando che la griglia lo ri-selezioni subito dopo
                 e.Handled = true;
             }
         }
     }
-
-
 }
