@@ -15,6 +15,8 @@ using Avalonia.Input;
 using Avalonia.VisualTree;
 using System.Collections.ObjectModel;
 using Avalonia.Media;
+using EmmaClientAv.Forms.Dialog;
+
 namespace EmmaClientAv.Forms.VisDocs;
 
 public partial class VisDocForms : Window
@@ -48,6 +50,10 @@ public partial class VisDocForms : Window
     }
 
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="masterDocumento"></param>
     private async Task CambioStato(MasterDocumento masterDocumento)
     {
         string urlApi = $"{App.Config.ServerUrl}/api/v1/doc/stato";
@@ -71,11 +77,20 @@ public partial class VisDocForms : Window
         }
     }
 
-    int GetTipoDocumento(string tipodoc)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="tipodoc"></param>
+    /// <returns></returns>
+    private int GetTipoDocumento(string tipodoc)
     {
         return int.Parse(tipodoc);
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="masterDocumento"></param>
     private async Task CancellaDocumento(MasterDocumento masterDocumento)
     {
         EmmaDocFilters emmaDocFilters = new()
@@ -107,15 +122,37 @@ public partial class VisDocForms : Window
         }
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void Button_OnElimina(object sender, RoutedEventArgs e)
     {
+        var dialog = new ConfermaDialog();
+        bool? risultato = await dialog.ShowDialog<bool?>(this);
+        if (risultato == false) return;
+      
+        
         // Recupera l'oggetto legato alla riga corrente
         var button = sender as Button;
         var documento = button?.DataContext as MasterDocumento;
 
         if (documento != null)
         {
-            await CancellaDocumento(documento);
+            try
+            {
+                this.Cursor = new Cursor(StandardCursorType.Wait);
+                await CancellaDocumento(documento);
+            }
+            catch (Exception ex)
+            {
+                await DialogHelper.ShowErrorDialog(this, "Errore", ex.Message);
+            }
+            finally
+            {
+                this.Cursor = Cursor.Default;
+            }
         }
     }
     
@@ -133,10 +170,18 @@ public partial class VisDocForms : Window
             bool apiSuccess = false;
             if (bottone.Content.ToString().ToLower() == "aggiungi")
             {
+                var dialog = new ConfermaDialog();
+                bool? risultato = await dialog.ShowDialog<bool?>(this);
+                if (risultato == false) return;
+                
                 _ = await InviaAddAllApi(riga);
             }
             else
             {
+                var dialog = new ConfermaDialog();
+                bool? risultato = await dialog.ShowDialog<bool?>(this);
+                if (risultato == false) return;
+                
                 apiSuccess = await InviaEliminazioneAllApi(riga);
                 if (apiSuccess && bottone.FindAncestorOfType<DataGrid>()?.DataContext is MasterDocumento master)
                 {
@@ -242,8 +287,26 @@ public partial class VisDocForms : Window
     {
         if (e.Source is Control visualElement && visualElement.DataContext is RigheDocumento rigaModificata)
         {
-            // Invia all'API
-            await InviaModificaAllApi(rigaModificata);
+            try
+            {
+                if (e.Source is Button)
+                {
+                    var b = (Button)e.Source;
+                    if (b is not null && b.Content == "Elimina") return;
+                }
+                
+
+                this.Cursor = new Cursor(StandardCursorType.Wait);
+                await InviaModificaAllApi(rigaModificata);
+            }
+            catch (Exception ex)
+            {
+                await DialogHelper.ShowErrorDialog(this, "Errore", ex.Message);
+            }
+            finally
+            {
+                this.Cursor = Cursor.Default;
+            }
         }
     }
     
@@ -255,7 +318,7 @@ public partial class VisDocForms : Window
     {
         try
         {
-            if (riga is null) return;
+            if (riga is null || string.IsNullOrWhiteSpace(riga.IdRiga)) return;
             
             var articoloBolla = new ArticoloBolla();
             articoloBolla.Id_Master = riga.IdMaster;
@@ -468,11 +531,16 @@ public partial class VisDocForms : Window
     {
         try
         {
+            this.Cursor = new Cursor(StandardCursorType.Wait);
             await CaricaDati();
         }
         catch (Exception ex)
         {
             await DialogHelper.ShowErrorDialog(this, "Errore", ex.Message);
+        }
+        finally
+        {
+            this.Cursor = Cursor.Default;
         }
     }
     
@@ -483,10 +551,23 @@ public partial class VisDocForms : Window
    /// <param name="e"></param>
     private async void Button_OnCambioStato(object? sender, RoutedEventArgs e)
     {
+        var dialog = new ConfermaDialog();
+        bool? risultato = await dialog.ShowDialog<bool?>(this);
+        if (risultato == false) return;
+        
         if (e.Source is Control visualElement && visualElement.DataContext is MasterDocumento master)
         {
-            await CambioStato(master);
-            await CaricaDati();
+            try
+            {
+                this.Cursor = new Cursor(StandardCursorType.Wait);
+                await CambioStato(master);
+                await CaricaDati();
+            }
+            catch (Exception exception)
+            {
+                this.Cursor = Cursor.Default;
+            }
+
         }
     }
 

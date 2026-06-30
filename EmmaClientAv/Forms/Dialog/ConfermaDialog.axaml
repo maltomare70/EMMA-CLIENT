@@ -1,0 +1,35 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="EmmaClientAv.Forms.Dialog.ConfermaDialog"
+        Title="Conferma" Width="300" Height="150"
+        WindowStartupLocation="CenterOwner">
+    
+    <StackPanel Margin="20" Spacing="20" VerticalAlignment="Center">
+        <TextBlock Text="Sei sicuro di voler procedere?" HorizontalAlignment="Center" FontSize="16"/>
+        
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+            <Button Content="Sì" 
+                    Click="OnYesClick" 
+                    Width="80" 
+                    Height="35"
+                    HotKey="Enter"  
+                    Background="#F44336" 
+                    Foreground="White"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"/>
+            
+            <Button Content="No" 
+                    Click="OnNoClick" 
+                    Width="80" 
+                    Height="35"
+                    HotKey="Escape"
+                    Background="#4CAF50" 
+                    Foreground="White"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

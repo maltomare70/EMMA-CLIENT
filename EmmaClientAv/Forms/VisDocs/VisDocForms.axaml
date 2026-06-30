@@ -7,7 +7,7 @@
         x:Class="EmmaClientAv.Forms.VisDocs.VisDocForms"
         Opened="Window_OnOpened"
         x:Name="RootWindow"
-        Title="VisDocForms">
+        Title="Visualizzatore Documenti">
 
     <Grid RowDefinitions="Auto, *" Margin="15">
          
@@ -79,10 +79,10 @@
             
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Fornitore" FontWeight="Bold" Binding="{Binding Fornitore}" Width="*"/>
-                <DataGridTextColumn Header="Tipo Documento" FontWeight="Bold" Binding="{Binding TipDocumento}" Width="150"/>
+                <DataGridTextColumn Header="Tipo Documento" FontWeight="Bold" Binding="{Binding TipDocumento}" Width="150" IsVisible="False"/>
                 <DataGridTextColumn Header="N° Documento" FontWeight="Bold" Binding="{Binding NumeroDocumento}" Width="150"/>
                 <DataGridTextColumn Header="Data Documento" FontWeight="Bold" Binding="{Binding DataDocumento}" Width="150"/>
-                <DataGridTextColumn Header="Stato Documento" FontWeight="Bold" Binding="{Binding StatoDocumento}" Width="150"/>
+                <DataGridTextColumn Header="Stato Documento" FontWeight="Bold" Binding="{Binding StatoDocumento}" Width="150" IsVisible="False"/>
                 
                 <DataGridTemplateColumn Header="" Width="100">
                     <DataGridTemplateColumn.CellTemplate>
@@ -131,7 +131,22 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Codice" Binding="{Binding CodiceArticolo}" IsReadOnly="False" Width="200"/>
                                     <DataGridTextColumn Header="Descrizione" Binding="{Binding DescrizioneArticolo}" IsReadOnly="False" Width="*"/>
-                                    <DataGridTextColumn Header="U.M." Binding="{Binding UnitaMisura}" Width="100" IsReadOnly="False" />
+                                                   
+                                    <DataGridTemplateColumn Width="100">
+                                        <DataGridTemplateColumn.Header>
+                                            <TextBlock Text="U.M." 
+                                                       HorizontalAlignment="Center" 
+                                                       VerticalAlignment="Center"/>
+                                        </DataGridTemplateColumn.Header>
+
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding UnitaMisura}" 
+                                                           HorizontalAlignment="Center" 
+                                                           VerticalAlignment="Center"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                     
                                     <DataGridTemplateColumn Header="Q.tà" Width="150" >
                                         <DataGridTemplateColumn.CellTemplate>
@@ -175,8 +190,23 @@
                                     </DataGridTemplateColumn>
                                     
                                     
-                                    <DataGridTextColumn Header="IVA" Binding="{Binding IVA}" IsReadOnly="False" Width="100"/>
-                    
+                           
+                                    <DataGridTemplateColumn Width="100">
+                                        <DataGridTemplateColumn.Header>
+                                            <TextBlock Text="IVA" 
+                                                       HorizontalAlignment="Center" 
+                                                       VerticalAlignment="Center"/>
+                                        </DataGridTemplateColumn.Header>
+
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding IVA}" 
+                                                           HorizontalAlignment="Center" 
+                                                           VerticalAlignment="Center"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    
                                     
                                     <DataGridTemplateColumn Header="Totale" Width="150" >
                                         <DataGridTemplateColumn.CellTemplate>
