@@ -70,6 +70,54 @@ public partial class VisDocForms : Window
             return;
         }
     }
+
+    int GetTipoDocumento(string tipodoc)
+    {
+        return int.Parse(tipodoc);
+    }
+    
+    private async Task CancellaDocumento(MasterDocumento masterDocumento)
+    {
+        EmmaDocFilters emmaDocFilters = new()
+        {
+            Fornitore =  masterDocumento.Fornitore,
+            NumeroDoc = masterDocumento.NumeroDocumento,
+            DataDoc = masterDocumento.DataDocumento,
+            TipoDoc = GetTipoDocumento(masterDocumento.TipDocumento),
+            Stato = masterDocumento.StatoDocumento == "Aperto" ? 0 : 1
+        };
+        
+        string urlApi = $"{App.Config.ServerUrl}/api/v1/doc";
+        using var request = new HttpRequestMessage(HttpMethod.Delete, urlApi);
+        var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
+        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+        request.Content = JsonContent.Create(emmaDocFilters);
+        
+        HttpResponseMessage response = await Client.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            await CaricaDati();
+            
+            return;
+        }
+        else
+        {
+            await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
+            return;
+        }
+    }
+    
+    private async void Button_OnElimina(object sender, RoutedEventArgs e)
+    {
+        // Recupera l'oggetto legato alla riga corrente
+        var button = sender as Button;
+        var documento = button?.DataContext as MasterDocumento;
+
+        if (documento != null)
+        {
+            await CancellaDocumento(documento);
+        }
+    }
     
     /// <summary>
     /// 
@@ -447,7 +495,11 @@ public partial class VisDocForms : Window
     /// </summary>
     private async Task CaricaDati()
     {
-        if ( CbTipoDocumento.SelectedIndex < 0) return;
+        if ( CbTipoDocumento.SelectedIndex < 0)
+        {
+            await  DialogHelper.ShowErrorDialog(this, "Informazione", $"Scegli un Tipo Documento");
+            return;
+        }
         var tipoDoc = CbTipoDocumento.SelectedIndex + 1;
 
         if ( CbStatoDocumento.SelectedIndex < 0) return;

@@ -84,22 +84,37 @@
                 <DataGridTextColumn Header="Data Documento" FontWeight="Bold" Binding="{Binding DataDocumento}" Width="150"/>
                 <DataGridTextColumn Header="Stato Documento" FontWeight="Bold" Binding="{Binding StatoDocumento}" Width="150"/>
                 
-                <DataGridTemplateColumn Header="Azioni" Width="100">
+                <DataGridTemplateColumn Header="" Width="100">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="entities:MasterDocumento">
-                            <Button Content="{Binding TestoBottone}"
-                                    Background="#2196F3"
-                                    Foreground="White"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Padding="10,5"
-                                    Click="Button_OnCambioStato"
-                            /> 
-                            
-                            
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Button Content="{Binding TestoBottone}"
+                                        Background="#2196F3"
+                                        Foreground="White"
+                                        Padding="10,5"
+                                        Margin="0,0,5,0"
+                                        Click="Button_OnCambioStato"/> 
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                
+                <DataGridTemplateColumn Header="" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="entities:MasterDocumento">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+                    
+                                <Button Content="Elimina"
+                                        Background="#F44336"
+                                        Foreground="White"
+                                        Padding="10,5"
+                                        Click="Button_OnElimina"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
             </DataGrid.Columns>
 
             <DataGrid.RowDetailsTemplate>

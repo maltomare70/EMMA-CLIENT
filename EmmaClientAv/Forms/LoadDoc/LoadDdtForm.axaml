@@ -43,6 +43,7 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
                     
                     <Button Click="Button_SaveOnClick"
+                            IsVisible="False"
                             Background="DodgerBlue"
                             Foreground="White"
                             Padding="12,8"
@@ -54,6 +55,7 @@
                     </Button>
                     
                     <Button Click="BtnAggiungi_Click"
+                            IsVisible="False"
                             Background="#4CAF50"
                             Foreground="White"
                             Padding="12,8"
@@ -65,6 +67,7 @@
                     </Button>
     
                     <Button Click="BtnElimina_Click"
+                            IsVisible="False"
                             Background="#F44336"
                             Foreground="White"
                             Padding="12,8"
