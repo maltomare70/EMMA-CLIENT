@@ -18,11 +18,11 @@
         <!-- Griglia principale dei Pulsanti (2 righe, 3 colonne) -->
         <UniformGrid Grid.Row="1" 
                      Rows="2" 
-                     Columns="3" 
+                     Columns="4" 
                      HorizontalAlignment="Center" 
                      VerticalAlignment="Center"
                      Margin="20"
-                     MaxWidth="700">
+                     MaxWidth="1000">
             
             <!-- ================= RIGA 1: OPERAZIONI DI CARICAMENTO ================= -->
             
@@ -38,11 +38,35 @@
             <Button Name="BtnVisualizza" Width="200" Height="200" Margin="12" Click="Button_OnClick"
                     Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
-                    <TextBlock Text="🌐" FontSize="42" HorizontalAlignment="Center"/>
+                    <TextBlock Text="👀" FontSize="42" HorizontalAlignment="Center"/>
                     <TextBlock Text="Visualizza Documenti" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
                 </StackPanel>
             </Button>
+            
+            
+            <Button Name="BtnFornitori" Width="200" Height="200" Margin="12" Click="Button_OnClick"
+                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+                    <TextBlock Text="🧑‍💼" FontSize="42" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Fornitori" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
 
+            <Button Name="BtnArticoliFornitori" Width="200" Height="200" Margin="12" Click="Button_OnClick"
+                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+                    <TextBlock Text="🏷️️" FontSize="42" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Articoli" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            
+            <Button Name="BtnConfigurazione" Width="200" Height="200" Margin="12" Click="Button_OnClick" 
+                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+                    <TextBlock Text="⚙️" FontSize="42" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Impostazioni" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
             <!-- ================= RIGA 2: GESTIONE E STRUMENTI ================= -->
 
             <!-- CARD 4: CONCILIAZIONE -->
@@ -64,13 +88,7 @@
             </Button>
 
             <!-- CARD 6: CONFIGURAZIONE -->
-            <Button Name="BtnConfigurazione" Width="180" Height="180" Margin="12" Click="Button_OnClick" IsVisible="False"
-                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
-                    <TextBlock Text="⚙️" FontSize="42" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Impostazioni" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Button>
+
 
         </UniformGrid>
     </Grid>

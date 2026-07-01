@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using EmmaClientAv.Forms.LoadDoc;
 using EmmaClientAv.Forms.VisDocs;
+using  EmmaClientAv.Forms.Fornitori;
 
 namespace EmmaClientAv;
 
@@ -28,15 +29,13 @@ public partial class MainWindow : Window
                 case "BtnVisualizza":
                     var visDocForms = new VisDocForms();
                     visDocForms.WindowState = WindowState.Maximized;
-                    visDocForms.Show();
+                    visDocForms.ShowDialog(this);
                     break;
 
-                case "BtnConciliazione":
-                    // Apri form Conciliazione
-                    break;
-
-                case "BtnSincronizzazione":
-                    // Avvia logica o apri form Sincronizzazione
+                case "BtnFornitori":
+                    var fornioriForms = new FornitoriForm();
+                    fornioriForms.WindowState = WindowState.Maximized;
+                    fornioriForms.ShowDialog(this);
                     break;
 
                 case "BtnConfigurazione":

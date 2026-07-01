@@ -1,0 +1,67 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:entities="clr-namespace:EmmaServer.Entities;assembly=EmmaServer.Entities"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="EmmaClientAv.Forms.Fornitori.FornitoriForm"
+        x:DataType="entities:EmmaFornitori"
+        Closing="FornitoriForm_Closing"
+        Title="FornitoriForm">
+<Grid RowDefinitions="Auto, *">
+        
+    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="10">
+        <Button Content="Aggiungi Fornitore" Click="Aggiungi_Click" Background="#2ecc71" Foreground="White"/>
+        <Button Content="Elimina Selezionato" Click="Elimina_Click" Background="#e74c3c" Foreground="White"/>
+        <Button Content="Salva Modifiche" Click="Salva_Click" Background="#3498db" Foreground="White"/>
+    </StackPanel>
+<DataGrid Grid.Row="1" 
+          Name="FornitoriGrid"
+          x:DataType="entities:EmmaFornitori" 
+          AutoGenerateColumns="False"
+          CanUserResizeColumns="True"
+          CanUserSortColumns="True"
+          GridLinesVisibility="All"
+          BorderThickness="1" 
+          BorderBrush="Gray"
+          Margin="10">
+    
+    <DataGrid.Columns>
+        <DataGridTextColumn Header="ID" 
+                            x:DataType="entities:EmmaFornitori"
+                            Binding="{Binding id}" 
+                            IsReadOnly="True" 
+                            Width="60"/>
+        
+        <DataGridTextColumn Header="Descrizione" 
+                            x:DataType="entities:EmmaFornitori"
+                            Binding="{Binding descrizione, Mode=TwoWay}" 
+                            Width="2*"/>
+        
+        <DataGridTextColumn Header="Riferimento" 
+                            x:DataType="entities:EmmaFornitori"
+                            Binding="{Binding riferimento, Mode=TwoWay}" 
+                            Width="1.5*"/>
+        
+        <DataGridTextColumn Header="Score" 
+                            x:DataType="entities:EmmaFornitori"
+                            Binding="{Binding score, Mode=TwoWay}" 
+                            IsReadOnly="True" 
+                            Width="80"/>
+
+        <DataGridTextColumn Header="Tenant" 
+                            x:DataType="entities:EmmaFornitori"
+                            Binding="{Binding tenant, Mode=TwoWay}" 
+                            IsReadOnly="True" 
+                            IsVisible="False"
+                            Width="1*"/>
+
+        <DataGridTextColumn Header="Data Creazione" 
+                            x:DataType="entities:EmmaFornitori"
+                            Binding="{Binding data_creazione, StringFormat=\{0:dd/MM/yyyy HH:mm\}}" 
+                            IsReadOnly="True" 
+                            Width="150"/>
+    </DataGrid.Columns>
+</DataGrid>
+    </Grid>
+</Window>

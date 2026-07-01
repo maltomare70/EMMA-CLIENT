@@ -113,7 +113,9 @@ public partial class LoadDdtForm : Window
                 if (datiBolla?.Articoli != null)
                 {
                     TxtFornitore.Text = datiBolla.Mittente;
-                    CbTipoDocumento.SelectedIndex = 1;
+
+                    _ = Int32.TryParse(datiBolla.TipoDocumento, out int tipoDoc);
+                    CbTipoDocumento.SelectedIndex = tipoDoc;
                     TxtNumeroDocumento.Text = datiBolla.NumeroBolla;
 
                     NumImponibile.Value = (decimal) datiBolla.Imponibile;
