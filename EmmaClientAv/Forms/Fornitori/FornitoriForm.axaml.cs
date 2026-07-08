@@ -137,19 +137,19 @@ public partial class FornitoriForm : Window
     }
     
     private void Aggiungi_Click(object? sender, RoutedEventArgs e)
+    {
+        var nuovoFornitore = new EmmaFornitori
         {
-            var nuovoFornitore = new EmmaFornitori
-            {
-                descrizione = "Nuovo Fornitore...",
-                riferimento = ""
-            };
-            
-            Fornitori.Add(nuovoFornitore);
-            
-            // Seleziona automaticamente il nuovo elemento e fai lo scroll
-            FornitoriGrid.SelectedItem = nuovoFornitore;
-            FornitoriGrid.ScrollIntoView(nuovoFornitore, null);
-        }
+            descrizione = "Nuovo Fornitore...",
+            riferimento = ""
+        };
+        
+        Fornitori.Add(nuovoFornitore);
+        
+        // Seleziona automaticamente il nuovo elemento e fai lo scroll
+        FornitoriGrid.SelectedItem = nuovoFornitore;
+        FornitoriGrid.ScrollIntoView(nuovoFornitore, null);
+    }
 
         // EVENTO CLICK: Elimina la riga selezionata
         private async void Elimina_Click(object? sender, RoutedEventArgs e)
