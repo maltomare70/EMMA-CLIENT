@@ -31,7 +31,7 @@ public partial class LoadDdtForm : Window
         
         // Colleghiamo la lista al DataGrid
         DataGridArticoli.ItemsSource = ListaArticoli;
-
+        CbTipoDocumento.Items.Add("0. Generico");
         CbTipoDocumento.Items.Add("1. Ordine");
         CbTipoDocumento.Items.Add("2. DDT");
         CbTipoDocumento.Items.Add("3. Fattura Accompagnatoria");
