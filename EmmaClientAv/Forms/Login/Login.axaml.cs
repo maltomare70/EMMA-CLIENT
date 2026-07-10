@@ -27,7 +27,7 @@ public partial class Login : Window
         BtnCancel.Click += BtnCancel_Click;
 
 #if DEBUG
-        TxtUser.Text = "maltomare70@gmail.com";
+        TxtUser.Text = "marco.altomare.1970@gmail.com";
         TxtPassword.Text = "nocafla";
 #endif
     }
