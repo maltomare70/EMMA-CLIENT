@@ -18,7 +18,7 @@
         <!-- Griglia principale dei Pulsanti (2 righe, 3 colonne) -->
         <UniformGrid Grid.Row="1" 
                      Rows="2" 
-                     Columns="4" 
+                     Columns="2" 
                      HorizontalAlignment="Center" 
                      VerticalAlignment="Center"
                      Margin="20"
@@ -30,15 +30,21 @@
             <Button Name="BtnFattura" Width="200" Height="200" Margin="12" Click="Button_OnClick"
                     Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
-                    <TextBlock Text="📄" FontSize="42" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Carica Documento" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+                    <Image Source="/Assets/doc.png" 
+                           Width="120" 
+                           Height="120"
+                           VerticalAlignment="Center"/>
+                    <TextBlock Text="Carica Documenti" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
                 </StackPanel>
             </Button>
 
             <Button Name="BtnVisualizza" Width="200" Height="200" Margin="12" Click="Button_OnClick"
                     Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
-                    <TextBlock Text="👀" FontSize="42" HorizontalAlignment="Center"/>
+                    <Image Source="/Assets/visdoc.png" 
+                           Width="120" 
+                           Height="120"
+                           VerticalAlignment="Center"/>
                     <TextBlock Text="Visualizza Documenti" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
                 </StackPanel>
             </Button>
@@ -47,7 +53,10 @@
             <Button Name="BtnFornitori" Width="200" Height="200" Margin="12" Click="Button_OnClick"
                     Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
-                    <TextBlock Text="🧑‍💼" FontSize="42" HorizontalAlignment="Center"/>
+                    <Image Source="/Assets/forn.png" 
+                           Width="120" 
+                           Height="120"
+                           VerticalAlignment="Center"/>
                     <TextBlock Text="Fornitori" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
                 </StackPanel>
             </Button>
@@ -55,7 +64,10 @@
             <Button Name="BtnArticoliFornitori" Width="200" Height="200" Margin="12" Click="Button_OnClick"
                     Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
-                    <TextBlock Text="🏷️️" FontSize="42" HorizontalAlignment="Center"/>
+                    <Image Source="/Assets/articoli.png" 
+                           Width="120" 
+                           Height="120"
+                           VerticalAlignment="Center"/>
                     <TextBlock Text="Articoli" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
                 </StackPanel>
             </Button>

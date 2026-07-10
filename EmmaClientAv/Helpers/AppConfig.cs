@@ -10,7 +10,7 @@ namespace EmmaClientAv.Helpers;
 // macOS: /Users/NomeUtente/Library/Application Support/EmmaClientAv/config.json
 public class AppConfig
 {
-    public string ServerUrl { get; set; } = string.Empty;
+    public string ServerUrl { get; set; } = "https://emma-server-uda8.onrender.com";
 }
 
 public static class ConfigManager

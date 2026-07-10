@@ -19,7 +19,26 @@
         </PackageReference>
     </ItemGroup>
 
+  <ItemGroup>
+      <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
     <ItemGroup>
       <ProjectReference Include="..\..\EMMA-SERVER\EmmaServer.Entities\EmmaServer.Entities.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Assets\articoli.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\doc.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\forn.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\visdoc.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 </Project>

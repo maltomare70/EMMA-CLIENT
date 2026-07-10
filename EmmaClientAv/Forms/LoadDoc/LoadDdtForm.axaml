@@ -5,7 +5,7 @@
         xmlns:entities="clr-namespace:EmmaServer.Entities;assembly=EmmaServer.Entities"
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
         x:Class="EmmaClientAv.Forms.LoadDoc.LoadDdtForm"
-        Title="Caricamento Documento"> 
+        Title="Caricamento Documenti"> 
     
     <Grid RowDefinitions="Auto, Auto, *" Margin="15">
         
