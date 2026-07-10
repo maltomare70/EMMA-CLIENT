@@ -2,13 +2,9 @@ using Avalonia;
 using Avalonia.Controls;
 using System.Collections.Generic;
 using EmmaServer.Entities;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Net.Http.Json;
 using Avalonia.Interactivity;
 using EmmaClientAv.Helpers;
 using Avalonia.Input;
@@ -16,18 +12,23 @@ using Avalonia.VisualTree;
 using System.Collections.ObjectModel;
 using Avalonia.Media;
 using EmmaClientAv.Forms.Dialog;
+using EmmaClientAv.Services;
+
 
 namespace EmmaClientAv.Forms.VisDocs;
 
 public partial class VisDocForms : Window
 {
     private ObservableCollection<MasterDocumento> DocumentiInGriglia { get; set; } = new();
-    private static readonly HttpClient Client = new HttpClient();
-    
+    private readonly IFornitoriService _fornitoriService;
+    private readonly IDocService _docService;
     public VisDocForms()
     {
         InitializeComponent();
-        
+
+        _fornitoriService = new FornitoriService();
+        _docService = new DocService();
+            
         CbStatoDocumento.Items.Add("0. Aperto");
         CbStatoDocumento.Items.Add("1. Chiuso");
         CbStatoDocumento.SelectedIndex = 0;
@@ -48,79 +49,7 @@ public partial class VisDocForms : Window
         DataGridArticoli.AddHandler(InputElement.LostFocusEvent, 
             OnElementLostFocus, RoutingStrategies.Bubble);
     }
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="masterDocumento"></param>
-    private async Task CambioStato(MasterDocumento masterDocumento)
-    {
-        string urlApi = $"{App.Config.ServerUrl}/api/v1/doc/stato";
-        using var request = new HttpRequestMessage(HttpMethod.Post, urlApi);
-        var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-        request.Content = JsonContent.Create(new CambioStato()
-        {
-            Id = masterDocumento.Id,
-            Stato = masterDocumento.StatoDocumento == "Aperto" ? 1 : 0
-        });
-        HttpResponseMessage response = await Client.SendAsync(request);
-        if (response.IsSuccessStatusCode)
-        {
-            return;
-        }
-        else
-        {
-            await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
-            return;
-        }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="tipodoc"></param>
-    /// <returns></returns>
-    private int GetTipoDocumento(string tipodoc)
-    {
-        return int.Parse(tipodoc);
-    }
     
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="masterDocumento"></param>
-    private async Task CancellaDocumento(MasterDocumento masterDocumento)
-    {
-        EmmaDocFilters emmaDocFilters = new()
-        {
-            Fornitore =  masterDocumento.Fornitore,
-            NumeroDoc = masterDocumento.NumeroDocumento,
-            DataDoc = masterDocumento.DataDocumento,
-            TipoDoc = GetTipoDocumento(masterDocumento.TipDocumento),
-            Stato = masterDocumento.StatoDocumento == "Aperto" ? 0 : 1
-        };
-        
-        string urlApi = $"{App.Config.ServerUrl}/api/v1/doc";
-        using var request = new HttpRequestMessage(HttpMethod.Delete, urlApi);
-        var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-        request.Content = JsonContent.Create(emmaDocFilters);
-        
-        HttpResponseMessage response = await Client.SendAsync(request);
-        if (response.IsSuccessStatusCode)
-        {
-            await CaricaDati();
-            
-            return;
-        }
-        else
-        {
-            await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
-            return;
-        }
-    }
     
     /// <summary>
     /// 
@@ -143,7 +72,8 @@ public partial class VisDocForms : Window
             try
             {
                 this.Cursor = new Cursor(StandardCursorType.Wait);
-                await CancellaDocumento(documento);
+                await _docService.CancellaDocumento(documento);
+                await CaricaDati();
             }
             catch (Exception ex)
             {
@@ -167,114 +97,41 @@ public partial class VisDocForms : Window
         {
             bottone.Background = Brush.Parse("#4CAF50");
             
-            bool apiSuccess = false;
             if (bottone.Content.ToString().ToLower() == "aggiungi")
             {
                 var dialog = new ConfermaDialog();
                 bool? risultato = await dialog.ShowDialog<bool?>(this);
                 if (risultato == false) return;
-                
-                _ = await InviaAddAllApi(riga);
+
+                try
+                {
+                    _ = await _docService.InviaAddAllApi(riga);
+                }
+                catch (Exception exception)
+                {
+                    await  DialogHelper.ShowErrorDialog(this, "Errore", $"{exception.Message}");
+                }
             }
             else
             {
                 var dialog = new ConfermaDialog();
                 bool? risultato = await dialog.ShowDialog<bool?>(this);
                 if (risultato == false) return;
-                
-                apiSuccess = await InviaEliminazioneAllApi(riga);
-                if (apiSuccess && bottone.FindAncestorOfType<DataGrid>()?.DataContext is MasterDocumento master)
+                try
                 {
-                    // Rimuove l'elemento dalla lista
-                    master.Dettagli.Remove(riga);
+                    bool apiSuccess = await _docService.InviaEliminazioneAllApi(riga);
+                    if (apiSuccess && bottone.FindAncestorOfType<DataGrid>()?.DataContext is MasterDocumento master)
+                    {
+                        // Rimuove l'elemento dalla lista
+                        master.Dettagli.Remove(riga);
+                    }
                 }
+                catch (Exception exception)
+                {
+                    await DialogHelper.ShowErrorDialog(this, "Errore", exception.Message);
+                }
+                
             }
-        }
-    }
-    
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="riga"></param>
-    /// <returns></returns>
-    private async Task<bool> InviaAddAllApi(RigheDocumento riga)
-    {
-        try
-        {
-            var articoloBolla = new ArticoloBolla();
-            articoloBolla.Id_Master = riga.IdMaster;
-            articoloBolla.Id_Riga = Guid.NewGuid().ToString();
-            articoloBolla.Quantita = riga.Qta;
-            articoloBolla.Descrizione = riga.DescrizioneArticolo;
-            articoloBolla.Codice = riga.CodiceArticolo;
-            articoloBolla.Imponibile = riga.Imponibile;
-            articoloBolla.Totale = riga.Totale;
-            articoloBolla.UnitaMisura = riga.UnitaMisura;
-            articoloBolla.Iva = riga.IVA;
-        
-            string urlApi = $"{App.Config.ServerUrl}/api/v1/doc/riga";
-            using var request = new HttpRequestMessage(HttpMethod.Post, urlApi);
-            var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-        
-            request.Content = JsonContent.Create(articoloBolla);
-            HttpResponseMessage response = await Client.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                return true;
-            }
-            else
-            {
-                await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
-                return false;
-            }
-        }
-        catch
-        {
-            return false;
-        }
-    }
-    
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="riga"></param>
-    /// <returns></returns>
-    private async Task<bool> InviaEliminazioneAllApi(RigheDocumento riga)
-    {
-        try
-        {
-            var articoloBolla = new ArticoloBolla();
-            articoloBolla.Id_Master = riga.IdMaster;
-            articoloBolla.Id_Riga = riga.IdRiga;
-            articoloBolla.Quantita = riga.Qta;
-            articoloBolla.Descrizione = riga.DescrizioneArticolo;
-            articoloBolla.Codice = riga.CodiceArticolo;
-            articoloBolla.Imponibile = riga.Imponibile;
-            articoloBolla.Totale = riga.Totale;
-            articoloBolla.UnitaMisura = riga.UnitaMisura;
-            articoloBolla.Iva = riga.IVA;
-        
-            string urlApi = $"{App.Config.ServerUrl}/api/v1/doc/riga";
-            using var request = new HttpRequestMessage(HttpMethod.Delete, urlApi);
-            var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-        
-            request.Content = JsonContent.Create(articoloBolla);
-            HttpResponseMessage response = await Client.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                return true;
-            }
-            else
-            {
-                await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
-                return false;
-            }
-        }
-        catch
-        {
-            return false;
         }
     }
     
@@ -285,7 +142,7 @@ public partial class VisDocForms : Window
     /// <param name="e"></param>
     private async void OnElementLostFocus(object? sender, RoutedEventArgs e)
     {
-        if (e.Source is Control visualElement && visualElement.DataContext is RigheDocumento rigaModificata)
+        if (e.Source is Control visualElement && visualElement.DataContext is RigheDocumento riga)
         {
             try
             {
@@ -294,10 +151,22 @@ public partial class VisDocForms : Window
                     var b = (Button)e.Source;
                     if (b is not null && b.Content == "Elimina") return;
                 }
-                
 
                 this.Cursor = new Cursor(StandardCursorType.Wait);
-                await InviaModificaAllApi(rigaModificata);
+                if (riga is null || string.IsNullOrWhiteSpace(riga.IdRiga)) return;
+            
+                var articoloBolla = new ArticoloBolla();
+                articoloBolla.Id_Master = riga.IdMaster;
+                articoloBolla.Id_Riga = riga.IdRiga;
+                articoloBolla.Quantita = riga.Qta;
+                articoloBolla.Descrizione = riga.DescrizioneArticolo;
+                articoloBolla.Codice = riga.CodiceArticolo;
+                articoloBolla.Imponibile = riga.Imponibile;
+                articoloBolla.Totale = riga.Totale;
+                articoloBolla.UnitaMisura = riga.UnitaMisura;
+                articoloBolla.Iva = riga.IVA;
+
+                await _docService.InviaModificaAllApi(articoloBolla);
             }
             catch (Exception ex)
             {
@@ -307,45 +176,6 @@ public partial class VisDocForms : Window
             {
                 this.Cursor = Cursor.Default;
             }
-        }
-    }
-    
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="riga"></param>
-    private async Task InviaModificaAllApi(RigheDocumento riga)
-    {
-        try
-        {
-            if (riga is null || string.IsNullOrWhiteSpace(riga.IdRiga)) return;
-            
-            var articoloBolla = new ArticoloBolla();
-            articoloBolla.Id_Master = riga.IdMaster;
-            articoloBolla.Id_Riga = riga.IdRiga;
-            articoloBolla.Quantita = riga.Qta;
-            articoloBolla.Descrizione = riga.DescrizioneArticolo;
-            articoloBolla.Codice = riga.CodiceArticolo;
-            articoloBolla.Imponibile = riga.Imponibile;
-            articoloBolla.Totale = riga.Totale;
-            articoloBolla.UnitaMisura = riga.UnitaMisura;
-            articoloBolla.Iva = riga.IVA;
-            
-            string urlApi = $"{App.Config.ServerUrl}/api/v1/doc/riga";
-            using var request = new HttpRequestMessage(HttpMethod.Put, urlApi);
-            var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-            
-            request.Content = JsonContent.Create(articoloBolla);
-            HttpResponseMessage response = await Client.SendAsync(request);
-            if (!response.IsSuccessStatusCode)
-            {
-                await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
-            }
-        }
-        catch (Exception ex)
-        {
-            await  DialogHelper.ShowErrorDialog(this, "Errore", $"{ex.Message}");
         }
     }
 
@@ -358,7 +188,7 @@ public partial class VisDocForms : Window
     {
         try
         {
-            var fornitori = await GetFornitoriAsync();
+            var fornitori = await _fornitoriService.GetFornitoriAsync();
             var listaFornitori = fornitori.ToList();
             // Inseriamo un elemento vuoto all'indice 0
             listaFornitori.Insert(0, new EmmaFornitori 
@@ -375,71 +205,6 @@ public partial class VisDocForms : Window
         }
     }
     
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    async Task<List<EmmaFornitori>> GetFornitoriAsync()
-    {
-        string urlApi = $"{App.Config.ServerUrl}/api/fornitori";
-        using var request = new HttpRequestMessage(HttpMethod.Get, urlApi);
-        var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-        HttpResponseMessage response = await Client.SendAsync(request);
-        if (response.IsSuccessStatusCode)
-        {
-            var emmaFornitoriList = await response.Content.ReadFromJsonAsync<List<EmmaFornitori>>().ConfigureAwait(false);
-            return emmaFornitoriList?.ToList() ?? new List<EmmaFornitori>();
-        }
-        else
-        {
-            await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
-            return new List<EmmaFornitori>();
-        }
-    }
-    
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="docFilters"></param>
-    /// <returns></returns>
-    async Task<List<EmmaDoc>> GetDocsAsync(EmmaDocFilters docFilters)
-    {
-        string urlApi = $"{App.Config.ServerUrl}/api/v1/doc";
-        using var request = new HttpRequestMessage(HttpMethod.Post, urlApi);
-        var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-        request.Content = JsonContent.Create(docFilters);
-    
-        try
-        {
-            // Use the shared client instance
-            HttpResponseMessage response = await Client.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                var emmaDocList = await response.Content.ReadFromJsonAsync<List<EmmaDoc>>();
-                return emmaDocList ?? new List<EmmaDoc>();
-            }
-            else
-            {
-                string errorContent = await response.Content.ReadAsStringAsync();
-            
-                await DialogHelper.ShowErrorDialog(
-                    this, 
-                    "Errore", 
-                    $"Errore durante l'invio: {(int)response.StatusCode} {response.ReasonPhrase}\nDettagli: {errorContent}"
-                );
-            
-                return new List<EmmaDoc>();
-            }
-        }
-        catch (Exception ex)
-        {
-            await DialogHelper.ShowErrorDialog(this, "Errore di rete", ex.Message);
-            return new List<EmmaDoc>();
-        }
-    }
-
     /// <summary>
     /// 
     /// </summary>
@@ -560,14 +325,17 @@ public partial class VisDocForms : Window
             try
             {
                 this.Cursor = new Cursor(StandardCursorType.Wait);
-                await CambioStato(master);
+                await _docService.CambioStato(master);
                 await CaricaDati();
             }
             catch (Exception exception)
             {
+                await DialogHelper.ShowErrorDialog(this, "Errore", exception.Message);
+            }
+            finally
+            {
                 this.Cursor = Cursor.Default;
             }
-
         }
     }
 
@@ -595,7 +363,7 @@ public partial class VisDocForms : Window
             TipoDoc = tipoDoc,
             Fornitore = fornitore?.descrizione ?? string.Empty
         };
-        var docs = await GetDocsAsync(docFilters);
+        var docs = await _docService.GetDocsAsync(docFilters);
         LoadDataGridData(docs);
     }
 

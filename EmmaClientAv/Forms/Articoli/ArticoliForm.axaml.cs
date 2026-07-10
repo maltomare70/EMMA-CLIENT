@@ -14,23 +14,24 @@ using EmmaClientAv.Helpers;
 using System.Collections.ObjectModel;
 
 using EmmaClientAv.Forms.Dialog;
+using EmmaClientAv.Services;
 
 namespace EmmaClientAv.Forms.Articoli;
 
 public partial class ArticoliForm : Window
 {
     public ObservableCollection<EmmaArticoli> Articoli { get; set; } = new();
-    private static readonly HttpClient Client = new HttpClient();
     private bool _autoChiusuraInCorso = false;
-    
+    private readonly IArticoliService _articoliService;
+    private readonly IFornitoriService _fornitoreService;
     public ArticoliForm()
     {
         InitializeComponent();
+        _articoliService = new ArticoliService();
+        _fornitoreService = new FornitoriService();
         
         CbFornitore.SelectionChanged += CbFornitoreOnSelectionChanged;
     }
-
-
 
     /// <summary>
     /// 
@@ -41,7 +42,7 @@ public partial class ArticoliForm : Window
     {
         try
         {
-            var fornitori = await GetFornitoriAsync();
+            var fornitori = await _fornitoreService.GetFornitoriAsync();
             var listaFornitori = fornitori.ToList();
             // Inseriamo un elemento vuoto all'indice 0
             listaFornitori.Insert(0, new EmmaFornitori 
@@ -58,66 +59,33 @@ public partial class ArticoliForm : Window
         }
     }
     
-    private async  void CaricaDati(string descrizione)
+    private async  Task CaricaDati(string descrizione)
     {
-        string urlApi = $"{App.Config.ServerUrl}/api/articoli?fornitore={descrizione}";
-        using var request = new HttpRequestMessage(HttpMethod.Get, urlApi);
-        var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-        HttpResponseMessage response = await Client.SendAsync(request);
-        if (response.IsSuccessStatusCode)
+        var emmaArticoliList = await _articoliService.GetArticoliFornitore(descrizione);
+        if (emmaArticoliList != null)
         {
-            var emmaArticoliList = await response.Content.ReadFromJsonAsync<List<EmmaArticoli>>().ConfigureAwait(false);
-            if (emmaArticoliList != null)
-            {
-                emmaArticoliList = emmaArticoliList.OrderBy(x => x.descrizione).ToList();
-                
-                // Usiamo Avalonia la UI Thread per svuotare e ripopolare in sicurezza
-                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    Articoli.Clear();
-
-                    foreach (var articolo in emmaArticoliList)
-                    {
-                        // Forza il reset a false dopo la deserializzazione
-                        articolo.IsDirty = false; 
+            emmaArticoliList = emmaArticoliList.OrderBy(x => x.descrizione).ToList();
             
-                        Articoli.Add(articolo);
-                    }
+            // Usiamo Avalonia la UI Thread per svuotare e ripopolare in sicurezza
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                Articoli.Clear();
 
-                    // Se l'hai già fatto nel costruttore o nello XAML, questa riga puoi anche ometterla
-                    ArticoliGrid.ItemsSource = Articoli; 
-                });
-            }
-        }
-        else
-        {
-            await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
-        }
-    }
+                foreach (var articolo in emmaArticoliList)
+                {
+                    // Forza il reset a false dopo la deserializzazione
+                    articolo.IsDirty = false; 
+        
+                    Articoli.Add(articolo);
+                }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    async Task<List<EmmaFornitori>> GetFornitoriAsync()
-    {
-        string urlApi = $"{App.Config.ServerUrl}/api/fornitori";
-        using var request = new HttpRequestMessage(HttpMethod.Get, urlApi);
-        var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-        HttpResponseMessage response = await Client.SendAsync(request);
-        if (response.IsSuccessStatusCode)
-        {
-            var emmaFornitoriList = await response.Content.ReadFromJsonAsync<List<EmmaFornitori>>().ConfigureAwait(false);
-            return emmaFornitoriList?.ToList() ?? new List<EmmaFornitori>();
+                // Se l'hai già fatto nel costruttore o nello XAML, questa riga puoi anche ometterla
+                ArticoliGrid.ItemsSource = Articoli; 
+            });
         }
-        else
-        {
-            await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
-            return new List<EmmaFornitori>();
-        }
+
     }
+    
     
     private async void ArticoliForm_Closing(object? sender, WindowClosingEventArgs e)
     {
@@ -158,7 +126,7 @@ public partial class ArticoliForm : Window
                     bool? risultato = await dialog.ShowDialog<bool?>(this);
                     if (risultato == false) return;
                         
-                    await DeleteArticolo(articoloSelezionato);
+                    await _articoliService.DeleteArticolo(articoloSelezionato);
                         
                     // Lo rimuoviamo dalla visualizzazione
                     Articoli.Remove(articoloSelezionato);
@@ -172,23 +140,7 @@ public partial class ArticoliForm : Window
         }
     }
     
-    private async Task DeleteArticolo(EmmaArticoli articolo)
-    {
-        string urlApi = $"{App.Config.ServerUrl}/api/articoli";
-        using var request = new HttpRequestMessage(HttpMethod.Delete, urlApi);
-        var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-        request.Content = JsonContent.Create(articolo);
-        HttpResponseMessage response = await Client.SendAsync(request);
-        if (response.IsSuccessStatusCode)
-        {
-            //
-        }
-        else
-        {
-            await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
-        }
-    }
+
 
     private async void Salva_Click(object? sender, RoutedEventArgs e)
     {
@@ -198,7 +150,6 @@ public partial class ArticoliForm : Window
             return;
         }
         
-
         var dialog = new ConfermaDialog();
         bool? risultato = await dialog.ShowDialog<bool?>(this);
         if (risultato == false) return;
@@ -213,12 +164,12 @@ public partial class ArticoliForm : Window
         {
             if (articoli.id == 0)
             {
-                await AddArticolo(articoli);
+                await _articoliService.AddArticolo(articoli);
                 inseriti++;
             }
             else if (articoli.IsDirty)
             {
-                await UpdateArticolo(articoli);
+                await _articoliService.UpdateArticolo(articoli);
             
                 // Resetta il flag dopo il salvataggio avvenuto con successo
                 articoli.IsDirty = false; 
@@ -231,49 +182,14 @@ public partial class ArticoliForm : Window
         {
             // Fai qualcosa con il fornitore selezionato
             var descrizione = fornitoreSelezionato.descrizione;
-            CaricaDati(descrizione);
+            await CaricaDati(descrizione);
         }
 
         await  DialogHelper.ShowErrorDialog(this, "Informazione", $"Salvataggio completato: {inseriti} inseriti, {aggiornati} aggiornati.");
     }
     
-    private async Task AddArticolo(EmmaArticoli articolo)
-    {
-        string urlApi = $"{App.Config.ServerUrl}/api/articoli";
-        using var request = new HttpRequestMessage(HttpMethod.Post, urlApi);
-        var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-        request.Content = JsonContent.Create(articolo);
-        HttpResponseMessage response = await Client.SendAsync(request);
-        if (response.IsSuccessStatusCode)
-        {
-            //
-        }
-        else
-        {
-            await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
-        }
-    }
-    
-    private async Task UpdateArticolo(EmmaArticoli articolo)
-    {
-        string urlApi = $"{App.Config.ServerUrl}/api/articoli";
-        using var request = new HttpRequestMessage(HttpMethod.Put, urlApi);
-        var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-        request.Content = JsonContent.Create(articolo);
-        HttpResponseMessage response = await Client.SendAsync(request);
-        if (response.IsSuccessStatusCode)
-        {
-            //
-        }
-        else
-        {
-            await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
-        }
-    }
 
-    private void CbFornitoreOnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    private async void CbFornitoreOnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (sender is ComboBox comboBox)
         {
@@ -284,7 +200,7 @@ public partial class ArticoliForm : Window
             {
                 // Fai qualcosa con il fornitore selezionato
                 var descrizione = fornitoreSelezionato.descrizione;
-                CaricaDati(descrizione);
+                await CaricaDati(descrizione);
                 
                 return; 
             }

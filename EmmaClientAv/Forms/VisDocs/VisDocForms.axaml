@@ -22,19 +22,7 @@
             <Grid ColumnDefinitions="*, Auto">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="20" VerticalAlignment="Center">
                     
-                    <Button Click="Button_OnClick"
-                            Background="#2196F3"
-                            Foreground="White"
-                            Padding="15,8"
-                            FontWeight="SemiBold"
-                            CornerRadius="4">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="📁" VerticalAlignment="Center"/>
-                            <TextBlock Text="Mostra Documenti ..." VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                    
-                    <Border Width="1" Height="25" Background="#E0E0E0"/>
+
 
                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                         <Label Content="Tipo Documento:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#333333"/>
@@ -61,6 +49,23 @@
                                   Width="200" 
                                   PlaceholderText="Seleziona Stato..."/>
                     </StackPanel>
+                    
+                    <Border Width="1" Height="25" Background="#E0E0E0"/>
+                    
+                    <Button Click="Button_OnClick"
+                            Background="#2196F3"
+                            Foreground="White"
+                            Padding="15,8"
+                            FontWeight="SemiBold"
+                            CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="📁" VerticalAlignment="Center"/>
+                            <TextBlock Text="Mostra Documenti ..." VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    
+                  
+                    
                 </StackPanel>
             </Grid>
         </Border>
@@ -124,6 +129,7 @@
                             <DataGrid 
                                 ItemsSource="{Binding Dettagli}"
                                       AutoGenerateColumns="False"
+                                      Foreground="Black"
                                       IsReadOnly="False" 
                                       GridLinesVisibility="All"
                                       BorderThickness="1"

@@ -1,72 +1,54 @@
-using Avalonia;
 using Avalonia.Controls;
-using System.Collections.Generic;
 using EmmaServer.Entities;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net.Http.Json;
 using Avalonia.Interactivity;
 using EmmaClientAv.Helpers;
 using System.Collections.ObjectModel;
 
 using EmmaClientAv.Forms.Dialog;
-
+using EmmaClientAv.Services;
 
 namespace EmmaClientAv.Forms.Fornitori;
 
 public partial class FornitoriForm : Window
 {
     public ObservableCollection<EmmaFornitori> Fornitori { get; set; } = new();
-    private static readonly HttpClient Client = new HttpClient();
     private bool _autoChiusuraInCorso = false;
+    private readonly IFornitoriService _fornitoriService;
     
     public FornitoriForm()
     {
         InitializeComponent();
         
+        _fornitoriService = new FornitoriService();
+        
         CaricaDati();
-
     }
     
     private async  void CaricaDati()
     {
-        string urlApi = $"{App.Config.ServerUrl}/api/fornitori";
-        using var request = new HttpRequestMessage(HttpMethod.Get, urlApi);
-        var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-        HttpResponseMessage response = await Client.SendAsync(request);
-        if (response.IsSuccessStatusCode)
+        var emmaFornitoriList = await _fornitoriService.GetFornitoriAsync();
+        if (emmaFornitoriList != null)
         {
-            var emmaFornitoriList = await response.Content.ReadFromJsonAsync<List<EmmaFornitori>>().ConfigureAwait(false);
-            if (emmaFornitoriList != null)
-            {
-                emmaFornitoriList = emmaFornitoriList.OrderBy(x => x.descrizione).ToList();
-                
-                // Usiamo Avalonia la UI Thread per svuotare e ripopolare in sicurezza
-                await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    Fornitori.Clear();
-
-                    foreach (var fornitore in emmaFornitoriList)
-                    {
-                        // Forza il reset a false dopo la deserializzazione
-                        fornitore.IsDirty = false; 
+            emmaFornitoriList = emmaFornitoriList.OrderBy(x => x.descrizione).ToList();
             
-                        Fornitori.Add(fornitore);
-                    }
+            // Usiamo Avalonia la UI Thread per svuotare e ripopolare in sicurezza
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                Fornitori.Clear();
 
-                    // Se l'hai già fatto nel costruttore o nello XAML, questa riga puoi anche ometterla
-                    FornitoriGrid.ItemsSource = Fornitori; 
-                });
-            }
-        }
-        else
-        {
-            await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
+                foreach (var fornitore in emmaFornitoriList)
+                {
+                    // Forza il reset a false dopo la deserializzazione
+                    fornitore.IsDirty = false; 
+        
+                    Fornitori.Add(fornitore);
+                }
+
+                // Se l'hai già fatto nel costruttore o nello XAML, questa riga puoi anche ometterla
+                FornitoriGrid.ItemsSource = Fornitori; 
+            });
         }
     }
     
@@ -84,7 +66,6 @@ public partial class FornitoriForm : Window
         {
             return; // Nessuna modifica, lascia chiudere la finestra normalmente
         }
-        
         
         // 3. Blocca temporaneamente la chiusura immediata della finestra per permettere il salvataggio asincrono
         e.Cancel = true;
@@ -110,12 +91,12 @@ public partial class FornitoriForm : Window
             {
                 if (fornitore.id == 0)
                 {
-                    await AddFornitore(fornitore);
+                    await _fornitoriService.AddFornitore(fornitore);
                     inseriti++;
                 }
                 else if (fornitore.IsDirty)
                 {
-                    await UpdateFornitore(fornitore);
+                    await _fornitoriService.UpdateFornitore(fornitore);
             
                     // Resetta il flag dopo il salvataggio avvenuto con successo
                     fornitore.IsDirty = false; 
@@ -165,7 +146,7 @@ public partial class FornitoriForm : Window
                         bool? risultato = await dialog.ShowDialog<bool?>(this);
                         if (risultato == false) return;
                         
-                        await DeleteFornitore(fornitoreSelezionato);
+                        await _fornitoriService.DeleteFornitore(fornitoreSelezionato);
                         
                         // Lo rimuoviamo dalla visualizzazione
                         Fornitori.Remove(fornitoreSelezionato);
@@ -179,23 +160,7 @@ public partial class FornitoriForm : Window
             }
         }
 
-        private async Task DeleteFornitore(EmmaFornitori fornitore)
-        {
-            string urlApi = $"{App.Config.ServerUrl}/api/fornitori";
-            using var request = new HttpRequestMessage(HttpMethod.Delete, urlApi);
-            var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-            request.Content = JsonContent.Create(fornitore);
-            HttpResponseMessage response = await Client.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                //
-            }
-            else
-            {
-                await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
-            }
-        }
+
         
         // EVENTO CLICK: Salva (Inserisce i nuovi o aggiorna gli esistenti)
         private async void Salva_Click(object? sender, RoutedEventArgs e)
@@ -214,12 +179,12 @@ public partial class FornitoriForm : Window
             {
                 if (fornitore.id == 0)
                 {
-                    await AddFornitore(fornitore);
+                    await _fornitoriService.AddFornitore(fornitore);
                     inseriti++;
                 }
                 else if (fornitore.IsDirty)
                 {
-                    await UpdateFornitore(fornitore);
+                    await _fornitoriService.UpdateFornitore(fornitore);
             
                     // Resetta il flag dopo il salvataggio avvenuto con successo
                     fornitore.IsDirty = false; 
@@ -230,41 +195,5 @@ public partial class FornitoriForm : Window
             // Opzionale: rinfresca la griglia
             CaricaDati();
             await  DialogHelper.ShowErrorDialog(this, "Informazione", $"Salvataggio completato: {inseriti} inseriti, {aggiornati} aggiornati.");
-        }
-
-        private async Task AddFornitore(EmmaFornitori fornitore)
-        {
-            string urlApi = $"{App.Config.ServerUrl}/api/fornitori";
-            using var request = new HttpRequestMessage(HttpMethod.Post, urlApi);
-            var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-            request.Content = JsonContent.Create(fornitore);
-            HttpResponseMessage response = await Client.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                //
-            }
-            else
-            {
-                await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
-            }
-        }
-        
-        private async Task UpdateFornitore(EmmaFornitori fornitore)
-        {
-            string urlApi = $"{App.Config.ServerUrl}/api/fornitori";
-            using var request = new HttpRequestMessage(HttpMethod.Put, urlApi);
-            var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{App.CurrentApp.EMMMA_USER}:{App.CurrentApp.EMMMA_PASSWORD}"));
-            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-            request.Content = JsonContent.Create(fornitore);
-            HttpResponseMessage response = await Client.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                //
-            }
-            else
-            {
-                await  DialogHelper.ShowErrorDialog(this, "Errore", $"Errore durante l'invio: {response.StatusCode} {response.Content}");
-            }
         }
 }

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http.Json;
 using EmmaClientAv.Helpers;
+using EmmaClientAv.Services;
 using EmmaServer.Entities;
 
 
@@ -15,52 +16,36 @@ namespace EmmaClientAv.Forms.Login;
 
 public partial class Login : Window
 {
+    private readonly ILoginService _loginService;
     public Login()
     {
         InitializeComponent();
 
+        _loginService = new LoginService();
+            
         BtnOk.Click += BtnOk_Click;
         BtnCancel.Click += BtnCancel_Click;
 
-
+#if DEBUG
         TxtUser.Text = "maltomare70@gmail.com";
         TxtPassword.Text = "nocafla";
+#endif
     }
 
     async Task<bool> IfLoginSucceded(string user, string password)
     {
-        string urlApi = $"{App.Config.ServerUrl}/api/v1/auth";
-        using var client = new HttpClient();
-        
-        using var request = new HttpRequestMessage(HttpMethod.Post, urlApi);
-
-        // Codifica "username:password" in Base64
-        var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{user}:{password}"));
-
-        // Aggiungi l'header Authorization nel formato "Basic [Token]"
-        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
-
-        HttpResponseMessage response = await client.SendAsync(request);
-
-        if (response.IsSuccessStatusCode)
-        {
-            var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
-            if (loginResponse is not null){
-                if (!string.IsNullOrWhiteSpace(loginResponse.url)){
-                    App.Config.ServerUrl = loginResponse.url;
-                    ConfigManager.Save(App.Config);
-                }
-
-                return loginResponse.esito;
+        var loginResponse =  await _loginService.LoginAsync(user, password);
+        if (loginResponse is not null){
+            if (!string.IsNullOrWhiteSpace(loginResponse.url)){
+                App.Config.ServerUrl = loginResponse.url;
+                ConfigManager.Save(App.Config);
             }
-            else 
-            {
-                return false;
-            }
+
+            return loginResponse.esito;
         }
-        else
+        else 
         {
-            throw new Exception($"Errore durante l'invio: {response.StatusCode} {response.Content}");
+            return false;
         }
     }
 

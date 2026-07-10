@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="600"
         x:Class="EmmaClientAv.MainWindow"
-        Title="Emma Gestionale Client"
+        Title="Emma Client"
         Background="#F5F7FA">
 
     <Grid RowDefinitions="Auto, *">
@@ -60,7 +60,7 @@
                 </StackPanel>
             </Button>
             
-            <Button Name="BtnConfigurazione" Width="200" Height="200" Margin="12" Click="Button_OnClick" 
+            <Button Name="BtnConfigurazione" Width="200" Height="200" Margin="12" Click="Button_OnClick"   IsVisible="False"
                     Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
                     <TextBlock Text="⚙️" FontSize="42" HorizontalAlignment="Center"/>

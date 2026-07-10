@@ -10,7 +10,7 @@ namespace EmmaClientAv.Helpers;
 // macOS: /Users/NomeUtente/Library/Application Support/EmmaClientAv/config.json
 public class AppConfig
 {
-    public string ServerUrl { get; set; } = "http://localhost:9111";
+    public string ServerUrl { get; set; } = string.Empty;
 }
 
 public static class ConfigManager
@@ -20,6 +20,7 @@ public static class ConfigManager
         "EmmaClient" // Nome della tua cartella dell'app
     );
     
+    //Linux Mint /home/sly/.config/EmmaClient
     private static readonly string FilePath = Path.Combine(FolderPath, "config.json");
 
     public static AppConfig Load()
