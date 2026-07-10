@@ -13,12 +13,34 @@ using System.Collections.ObjectModel;
 using Avalonia.Media;
 using EmmaClientAv.Forms.Dialog;
 using EmmaClientAv.Services;
-
-
+using System.Globalization;
+using Avalonia.Data.Converters;
 namespace EmmaClientAv.Forms.VisDocs;
 
+public class TestoToBackgroundConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        string? testo = value as string;
+
+        if (testo == "Elimina")
+        {
+            // Ritorna il rosso che usavi prima
+            return Brush.Parse("#FF4D4D");
+        }
+
+        // Colore di default se il testo è diverso (es. Grigio o Trasparente)
+        return Brush.Parse("#4CAF50"); //"#7F7F7F"
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return AvaloniaProperty.UnsetValue;
+    }
+}
 public partial class VisDocForms : Window
 {
+    
     private ObservableCollection<MasterDocumento> DocumentiInGriglia { get; set; } = new();
     private readonly IFornitoriService _fornitoriService;
     private readonly IDocService _docService;
@@ -95,7 +117,7 @@ public partial class VisDocForms : Window
     {
         if (sender is Button bottone && bottone.DataContext is RigheDocumento riga)
         {
-            bottone.Background = Brush.Parse("#4CAF50");
+            //bottone.Background = Brush.Parse("#4CAF50");
             
             if (bottone.Content.ToString().ToLower() == "aggiungi")
             {
@@ -106,6 +128,9 @@ public partial class VisDocForms : Window
                 try
                 {
                     _ = await _docService.InviaAddAllApi(riga);
+
+                    bottone.Content = "Elimina";
+                    bottone.Background =  Brush.Parse("#FF4D4D");
                 }
                 catch (Exception exception)
                 {
@@ -260,7 +285,7 @@ public partial class VisDocForms : Window
     /// <summary>
     /// 
     /// </summary>
-    private async void AggiungiRiga_Click()
+    private async void  AggiungiRiga_Click()
     {
         if (DataGridArticoli.SelectedItem is MasterDocumento masterSelezionato)
         {

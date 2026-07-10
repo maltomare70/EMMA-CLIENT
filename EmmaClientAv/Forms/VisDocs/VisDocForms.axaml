@@ -3,12 +3,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:entities="clr-namespace:EmmaServer.Entities;assembly=EmmaServer.Entities"
+        xmlns:conv="using:EmmaClientAv.Forms.VisDocs"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="EmmaClientAv.Forms.VisDocs.VisDocForms"
         Opened="Window_OnOpened"
         x:Name="RootWindow"
         Title="Visualizzatore Documenti">
 
+    <Window.Resources>
+        <conv:TestoToBackgroundConverter x:Key="TestoToBackgroundConverter" />
+    </Window.Resources>
+    
     <Grid RowDefinitions="Auto, *" Margin="15">
          
         <Border Grid.Row="0"
@@ -237,7 +242,7 @@
                                     <DataGridTemplateColumn Width="100">
                                         <DataTemplate x:DataType="entities:RigheDocumento">
                                             <Button Content="{Binding TestoBottone}" 
-                                                    Background="#FF4D4D" 
+                                                    Background="{Binding TestoBottone, Converter={StaticResource TestoToBackgroundConverter}}"
                                                     Foreground="White"
                                                     Padding="5,2"
                                                     HorizontalAlignment="Center"
@@ -250,7 +255,7 @@
                                 </DataGrid.Columns>
                             </DataGrid>
                             
-                            <Button Content="+ Aggiungi Articolo"
+                            <Button Content="+ Nuova Riga"
                                     Name="BtnAggiungiArticolo"
                                     Background="#4CAF50"
                                     Foreground="White"
