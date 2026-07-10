@@ -294,8 +294,8 @@ public partial class VisDocForms : Window
             {
                 IdRiga = "",
                 IdMaster = masterSelezionato.Id,
-                CodiceArticolo = "",
-                DescrizioneArticolo = "",
+                CodiceArticolo = "Nuovo Codice",
+                DescrizioneArticolo = "Nuova Descrizione",
                 UnitaMisura = "",
                 Qta = 0,
                 Imponibile = 0,
