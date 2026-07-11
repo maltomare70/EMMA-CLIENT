@@ -65,6 +65,8 @@ public partial class VisDocForms : Window
             CbTipoDocumento.Items.Add(items[i]);    
         }
         
+        CbTipoDocumento.SelectedIndex = 0;
+        
         DataGridArticoli.AddHandler(
             InputElement.PointerPressedEvent, 
             DataGridArticoli_OnPointerPressed, 
