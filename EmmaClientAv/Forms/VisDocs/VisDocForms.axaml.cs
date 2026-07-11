@@ -51,16 +51,19 @@ public partial class VisDocForms : Window
 
         _fornitoriService = new FornitoriService(App.Config.ServerUrl, App.CurrentApp.EMMMA_USER, App.CurrentApp.EMMMA_PASSWORD);
         _docService = new DocService(App.Config.ServerUrl, App.CurrentApp.EMMMA_USER, App.CurrentApp.EMMMA_PASSWORD);
-            
-        CbStatoDocumento.Items.Add("0. Aperto");
-        CbStatoDocumento.Items.Add("1. Chiuso");
+
+        var stati = ArticoliServiceManager.GetStatodocs();
+        for (int i = 0; i < stati.Length; i++)
+        {
+            CbStatoDocumento.Items.Add(stati[i]);
+        }
         CbStatoDocumento.SelectedIndex = 0;
         
-        CbTipoDocumento.Items.Add("1. Ordine");
-        CbTipoDocumento.Items.Add("2. DDT");
-        CbTipoDocumento.Items.Add("3. Fattura Accompagnatoria");
-        CbTipoDocumento.Items.Add("4. Fattura");
-        CbTipoDocumento.Items.Add("5. Nota di Accredito");
+        var items = ArticoliServiceManager.GetTipodocs();
+        for (int i = 0; i < items.Length; i++)
+        {
+            CbTipoDocumento.Items.Add(items[i]);    
+        }
         
         DataGridArticoli.AddHandler(
             InputElement.PointerPressedEvent, 
@@ -375,7 +378,7 @@ public partial class VisDocForms : Window
             await  DialogHelper.ShowErrorDialog(this, "Informazione", $"Scegli un Tipo Documento");
             return;
         }
-        var tipoDoc = CbTipoDocumento.SelectedIndex + 1;
+        var tipoDoc = CbTipoDocumento.SelectedIndex;
 
         if ( CbStatoDocumento.SelectedIndex < 0) return;
         var statoDoc = CbStatoDocumento.SelectedIndex;

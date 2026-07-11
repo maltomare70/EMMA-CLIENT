@@ -89,7 +89,7 @@
             
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Fornitore" FontWeight="Bold" Binding="{Binding Fornitore}" Width="*"/>
-                <DataGridTextColumn Header="Tipo Documento" FontWeight="Bold" Binding="{Binding TipDocumento}" Width="150" IsVisible="False"/>
+                <DataGridTextColumn Header="Tipo Doc." FontWeight="Bold" Binding="{Binding TipDocumento}" Width="100" IsVisible="True"/>
                 <DataGridTextColumn Header="N° Documento" FontWeight="Bold" Binding="{Binding NumeroDocumento}" Width="150"/>
                 <DataGridTextColumn Header="Data Documento" FontWeight="Bold" Binding="{Binding DataDocumento}" Width="150"/>
                 <DataGridTextColumn Header="Stato Documento" FontWeight="Bold" Binding="{Binding StatoDocumento}" Width="150" IsVisible="False"/>

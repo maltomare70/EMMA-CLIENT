@@ -14,7 +14,8 @@ using System.Threading.Tasks;
 using System.Text;
 using EmmaServer.Entities;
 using System.Net.Http.Json;
-  
+using EmmaClientAv.Services;
+
 namespace EmmaClientAv.Forms.LoadDoc;
 
 public partial class LoadDdtForm : Window
@@ -30,12 +31,12 @@ public partial class LoadDdtForm : Window
         
         // Colleghiamo la lista al DataGrid
         DataGridArticoli.ItemsSource = ListaArticoli;
-        CbTipoDocumento.Items.Add("0. Generico");
-        CbTipoDocumento.Items.Add("1. Ordine");
-        CbTipoDocumento.Items.Add("2. DDT");
-        CbTipoDocumento.Items.Add("3. Fattura Accompagnatoria");
-        CbTipoDocumento.Items.Add("4. Fattura");
-        CbTipoDocumento.Items.Add("5. Nota di Accredito");
+
+        var items = ArticoliServiceManager.GetTipodocs();
+        for (int i = 0; i < items.Length; i++)
+        {
+            CbTipoDocumento.Items.Add(items[i]);    
+        }
     }
 
     
