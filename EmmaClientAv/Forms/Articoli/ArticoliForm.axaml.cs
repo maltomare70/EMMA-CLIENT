@@ -1,14 +1,8 @@
-using Avalonia;
 using Avalonia.Controls;
-using System.Collections.Generic;
 using EmmaServer.Entities;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Net.Http.Json;
 using Avalonia.Interactivity;
 using EmmaClientAv.Helpers;
 using System.Collections.ObjectModel;
@@ -27,8 +21,8 @@ public partial class ArticoliForm : Window
     public ArticoliForm()
     {
         InitializeComponent();
-        _articoliService = new ArticoliService();
-        _fornitoreService = new FornitoriService();
+        _articoliService = new ArticoliService(App.Config.ServerUrl, App.CurrentApp.EMMMA_USER, App.CurrentApp.EMMMA_PASSWORD);
+        _fornitoreService = new FornitoriService(App.Config.ServerUrl, App.CurrentApp.EMMMA_USER, App.CurrentApp.EMMMA_PASSWORD);
         
         CbFornitore.SelectionChanged += CbFornitoreOnSelectionChanged;
     }

@@ -24,6 +24,7 @@
   </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\EMMA-SERVER\Emma.Services\Emma.Services.csproj" />
       <ProjectReference Include="..\..\EMMA-SERVER\EmmaServer.Entities\EmmaServer.Entities.csproj" />
     </ItemGroup>
 

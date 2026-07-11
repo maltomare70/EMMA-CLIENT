@@ -15,6 +15,7 @@ using EmmaClientAv.Forms.Dialog;
 using EmmaClientAv.Services;
 using System.Globalization;
 using Avalonia.Data.Converters;
+
 namespace EmmaClientAv.Forms.VisDocs;
 
 public class TestoToBackgroundConverter : IValueConverter
@@ -48,8 +49,8 @@ public partial class VisDocForms : Window
     {
         InitializeComponent();
 
-        _fornitoriService = new FornitoriService();
-        _docService = new DocService();
+        _fornitoriService = new FornitoriService(App.Config.ServerUrl, App.CurrentApp.EMMMA_USER, App.CurrentApp.EMMMA_PASSWORD);
+        _docService = new DocService(App.Config.ServerUrl, App.CurrentApp.EMMMA_USER, App.CurrentApp.EMMMA_PASSWORD);
             
         CbStatoDocumento.Items.Add("0. Aperto");
         CbStatoDocumento.Items.Add("1. Chiuso");

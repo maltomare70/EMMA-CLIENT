@@ -21,7 +21,7 @@ public partial class FornitoriForm : Window
     {
         InitializeComponent();
         
-        _fornitoriService = new FornitoriService();
+        _fornitoriService = new FornitoriService(App.Config.ServerUrl, App.CurrentApp.EMMMA_USER, App.CurrentApp.EMMMA_PASSWORD);
         
         CaricaDati();
     }
