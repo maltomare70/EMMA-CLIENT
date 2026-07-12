@@ -36,6 +36,17 @@ public partial class Login : Window
                 ConfigManager.Save(App.Config);
             }
 
+            try
+            {
+                IDocService docService = new DocService(App.Config.ServerUrl, user, password);
+                bool ret = await docService.PingAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            
             return loginResponse.esito;
         }
         else 
@@ -68,6 +79,7 @@ public partial class Login : Window
             {
                 App.CurrentApp.EMMMA_USER = username!;
                 App.CurrentApp.EMMMA_PASSWORD = password!;
+                
 
                 // Se il login è corretto, recuperiamo l'ApplicationLifetime corrente
                 if (App.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
