@@ -1,20 +1,22 @@
 using Avalonia;
 using Avalonia.Controls;
-using System.Collections.Generic;
+using Avalonia.Data.Converters;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Media;
+using Avalonia.VisualTree;
+using EmmaClientAv.Forms.Dialog;
+using EmmaClientAv.Helpers;
+using EmmaClientAv.Services;
 using EmmaServer.Entities;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Avalonia.Interactivity;
-using EmmaClientAv.Helpers;
-using Avalonia.Input;
-using Avalonia.VisualTree;
-using System.Collections.ObjectModel;
-using Avalonia.Media;
-using EmmaClientAv.Forms.Dialog;
-using EmmaClientAv.Services;
-using System.Globalization;
-using Avalonia.Data.Converters;
 
 namespace EmmaClientAv.Forms.VisDocs;
 
@@ -255,7 +257,8 @@ public partial class VisDocForms : Window
                 NumeroDocumento = doc.NumeroBolla, 
                 DataDocumento = doc.DataBolla,
                 StatoDocumento = emmaDoc?.stato == 0 ? "Aperto" : "Chiuso",
-                TipDocumento = doc.TipoDocumento
+                TipDocumento = doc.TipoDocumento,                
+                Allegato = emmaDoc?.allegato
             };
 
             ObservableCollection<RigheDocumento> dettagli = new ObservableCollection<RigheDocumento>();
@@ -287,7 +290,44 @@ public partial class VisDocForms : Window
         DocumentiInGriglia = new ObservableCollection<MasterDocumento>(datiOrdinati);
         DataGridArticoli.ItemsSource = DocumentiInGriglia;
     }
-    
+
+
+    private async void OnLoadPdfClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+
+            if (e.Source is Control visualElement && visualElement.DataContext is MasterDocumento master)
+            {
+                var pdfBytes = master.Allegato;
+                if (pdfBytes != null && pdfBytes.Length > 0)
+                {
+                    // Creiamo il percorso temporaneo
+                    string tempFilePath = Path.Combine(Path.GetTempPath(), $"doc_{master.Id}.pdf");
+
+                    // Usando il blocco 'using' assicuriamo che il file venga sbloccato IMMEDIATAMENTE dal sistema
+                    using (var fs = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write))
+                    {
+                        await fs.WriteAsync(pdfBytes, 0, pdfBytes.Length);
+                    } // <--- Qui il file viene chiuso e rilasciato al 100%
+
+                    // Avviamo il visualizzatore predefinito del sistema operativo
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = tempFilePath,
+                        UseShellExecute = true // Fondamentale per aprire il visualizzatore di sistema
+                    };
+                    Process.Start(psi);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Errore: {ex.Message}");
+        }
+    }
+
+
     /// <summary>
     /// 
     /// </summary>

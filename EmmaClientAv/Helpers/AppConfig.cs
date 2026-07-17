@@ -36,7 +36,11 @@ public static class ConfigManager
             }
 
             string json = File.ReadAllText(FilePath);
+#if DEBUG
+        return new AppConfig() { ServerUrl = "http://localhost:9111" };
+#else
             return JsonSerializer.Deserialize<AppConfig>(json) ?? new AppConfig();
+#endif
         }
         catch
         {
