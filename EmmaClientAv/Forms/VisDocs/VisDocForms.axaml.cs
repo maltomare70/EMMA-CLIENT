@@ -4,6 +4,7 @@ using Avalonia.Data.Converters;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using Avalonia.VisualTree;
 using EmmaClientAv.Forms.Dialog;
 using EmmaClientAv.Helpers;
@@ -13,9 +14,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace EmmaClientAv.Forms.VisDocs;
@@ -79,8 +82,94 @@ public partial class VisDocForms : Window
         DataGridArticoli.AddHandler(InputElement.LostFocusEvent, 
             OnElementLostFocus, RoutingStrategies.Bubble);
     }
+
     
-    
+     
+    private async void CloseAllButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        var source = DataGridArticoli.ItemsSource;
+        if (source is null) return;
+
+        var dialog = new ConfermaDialog();
+        bool? risultato = await dialog.ShowDialog<bool?>(this);
+        if (risultato == false) return;
+
+        if (source is IEnumerable<MasterDocumento> listaDocumenti)
+        {
+            foreach (MasterDocumento master in listaDocumenti)
+            {
+
+                try
+                {
+                    this.Cursor = new Cursor(StandardCursorType.Wait);
+                    await _docService.CambioStato(master);
+                    LoadDataGridData(await CaricaDati());
+                }
+                catch (Exception exception)
+                {
+                    await DialogHelper.ShowErrorDialog(this, "Errore", exception.Message);
+                }
+                finally
+                {
+                    this.Cursor = Cursor.Default;
+                }
+            }
+        }
+
+
+        
+    }
+
+    private async void ExportButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        var source = DataGridArticoli.ItemsSource;
+        if (source is null) return;
+
+        string sep = ";";
+        StringBuilder sb = new StringBuilder();
+
+        if (source is IEnumerable<MasterDocumento> listaDocumenti)
+        {
+            foreach (MasterDocumento doc in listaDocumenti)
+            {
+                sb.AppendLine($"M{sep}{doc.Id}{sep}{doc.Fornitore}{sep}{doc.NumeroDocumento}{sep}{doc.DataDocumento}{sep}{doc.TipDocumento}{sep}{doc.StatoDocumento}");
+                foreach (var item in doc.Dettagli)
+                {
+                    //TODO degli articoli si potrebbe aggiungere il riferimento esterno per facilitare la conciliazione
+                    sb.AppendLine($"R{sep}{item.IdRiga}{sep}{item.CodiceArticolo}{sep}{item.DescrizioneArticolo}{sep}{item.Qta}{sep}{item.UnitaMisura}");
+                }
+            }
+        }
+        else
+        {
+            return;
+        }
+
+        var topLevel = TopLevel.GetTopLevel(this);
+        if (topLevel == null) return;
+
+        var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Esporta Documenti",
+            SuggestedFileName = $"{Guid.NewGuid().ToString()}.csv",
+            DefaultExtension = "csv",
+            FileTypeChoices = new[]
+            {
+                new FilePickerFileType("File CSV") { Patterns = new[] { "*.csv" } },
+                new FilePickerFileType("File di testo") { Patterns = new[] { "*.txt" } }
+            }
+        });
+
+        if (file != null)
+        {
+            using (var stream = await file.OpenWriteAsync())
+            using (var writer = new StreamWriter(stream, Encoding.UTF8))
+            {
+                await writer.WriteAsync(sb.ToString());
+            }
+        }
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -103,7 +192,7 @@ public partial class VisDocForms : Window
             {
                 this.Cursor = new Cursor(StandardCursorType.Wait);
                 await _docService.CancellaDocumento(documento);
-                await CaricaDati();
+                LoadDataGridData(await CaricaDati());
             }
             catch (Exception ex)
             {
@@ -242,20 +331,22 @@ public partial class VisDocForms : Window
     /// 
     /// </summary>
     /// <param name="docs"></param>
-    private void LoadDataGridData(List<EmmaDoc> docs)
+    private void LoadDataGridData(List<EmmaDoc>? docs)
     {
+        if (docs is null) return;
+
         List<MasterDocumento> sampleData = new List<MasterDocumento>();
         foreach (var emmaDoc in docs)
         {
             var doc = emmaDoc?.ToDoc();
             if ( doc is null ) continue;
-            
+
             var master = new MasterDocumento()
             {
                 Id = doc.Id,
                 Fornitore = doc.Mittente, 
                 NumeroDocumento = doc.NumeroBolla, 
-                DataDocumento = doc.DataBolla,
+                DataDocumento = DateHelper.ConvertData(doc.DataBolla),
                 StatoDocumento = emmaDoc?.stato == 0 ? "Aperto" : "Chiuso",
                 TipDocumento = doc.TipoDocumento,                
                 Allegato = emmaDoc?.allegato
@@ -368,7 +459,7 @@ public partial class VisDocForms : Window
         try
         {
             this.Cursor = new Cursor(StandardCursorType.Wait);
-            await CaricaDati();
+            LoadDataGridData(await CaricaDati());
         }
         catch (Exception ex)
         {
@@ -397,7 +488,7 @@ public partial class VisDocForms : Window
             {
                 this.Cursor = new Cursor(StandardCursorType.Wait);
                 await _docService.CambioStato(master);
-                await CaricaDati();
+                LoadDataGridData(await CaricaDati());
             }
             catch (Exception exception)
             {
@@ -413,16 +504,16 @@ public partial class VisDocForms : Window
     /// <summary>
     /// 
     /// </summary>
-    private async Task CaricaDati()
+    private async Task<List<EmmaDoc>?> CaricaDati()
     {
         if ( CbTipoDocumento.SelectedIndex < 0)
         {
             await  DialogHelper.ShowErrorDialog(this, "Informazione", $"Scegli un Tipo Documento");
-            return;
+            return null;
         }
         var tipoDoc = CbTipoDocumento.SelectedIndex;
 
-        if ( CbStatoDocumento.SelectedIndex < 0) return;
+        if ( CbStatoDocumento.SelectedIndex < 0) return null;
         var statoDoc = CbStatoDocumento.SelectedIndex;
         
         var item = CbFornitore.SelectedItem;
@@ -435,7 +526,8 @@ public partial class VisDocForms : Window
             Fornitore = fornitore?.descrizione ?? string.Empty
         };
         var docs = await _docService.GetDocsAsync(docFilters);
-        LoadDataGridData(docs);
+        return docs;
+       // LoadDataGridData(docs);
     }
 
     

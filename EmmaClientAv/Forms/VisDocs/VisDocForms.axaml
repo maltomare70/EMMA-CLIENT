@@ -68,9 +68,35 @@
                             <TextBlock Text="Mostra Documenti ..." VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
-                    
-                  
-                    
+
+					<Border Width="1" Height="25" Background="#E0E0E0"/>
+
+					<Button Click="ExportButton_OnClick"
+                        Background="#2196F3"
+                        Foreground="White"
+                        Padding="15,8"
+                        FontWeight="SemiBold"
+                        CornerRadius="4">
+						<StackPanel Orientation="Horizontal" Spacing="8">
+							<TextBlock Text="💾" VerticalAlignment="Center"/>
+							<TextBlock Text="Esporta su file ..." VerticalAlignment="Center"/>
+						</StackPanel>
+					</Button>
+
+					<Border Width="1" Height="25" Background="#E0E0E0"/>
+
+					<Button Click="CloseAllButton_OnClick"
+							Background="#757575"
+							Foreground="White"
+							Padding="15,8"
+							FontWeight="SemiBold"
+							CornerRadius="4">
+						<StackPanel Orientation="Horizontal" Spacing="8">
+							<TextBlock Text="❌" VerticalAlignment="Center"/>
+							<TextBlock Text="Chiudi Tutto" VerticalAlignment="Center"/>
+						</StackPanel>
+					</Button>
+					
                 </StackPanel>
             </Grid>
         </Border>
