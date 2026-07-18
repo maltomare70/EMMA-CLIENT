@@ -15,12 +15,14 @@ public static class DateHelper
     public static string ConvertData(string data)
     {
 
-        string dataDoc;
-        if (DateTime.TryParseExact(data, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out DateTime dataConvertita))
-            dataDoc = dataConvertita.ToString("dd/MM/yyyy");
-        else
-            dataDoc = data;
+        return data;
 
-        return dataDoc;
+        //string dataDoc;
+        //if (DateTime.TryParseExact(data, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out DateTime dataConvertita))
+        //    dataDoc = dataConvertita.ToString("dd/MM/yyyy");
+        //else
+        //    dataDoc = data;
+
+        //return dataDoc;
     }
 }

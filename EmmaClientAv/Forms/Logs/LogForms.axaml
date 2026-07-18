@@ -1,0 +1,94 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:entities="clr-namespace:EmmaServer.Entities;assembly=EmmaServer.Entities"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="EmmaClientAv.LogForms"
+        x:DataType="entities:EmmaLog"
+        Title="Log">
+	<Grid RowDefinitions="Auto, *">
+	<DataGrid Grid.Row="1"
+			  Name="LogGrid"
+			  x:DataType="entities:EmmaLog"
+			  AutoGenerateColumns="False"
+			  CanUserResizeColumns="True"
+			  CanUserSortColumns="True"
+			  GridLinesVisibility="All"
+			  BorderThickness="1"
+			  BorderBrush="Gray"
+			  Margin="10">
+
+	<DataGrid.Columns>
+		<DataGridTextColumn Header="ID"
+                            x:DataType="entities:EmmaLog"
+                            Binding="{Binding id}"
+                            IsReadOnly="True"
+                            Width="60"/>
+
+		<DataGridTextColumn Header="Tenant"
+                            x:DataType="entities:EmmaLog"
+                            Binding="{Binding tenant}"
+                            IsReadOnly="True"
+                            IsVisible="False"
+                            Width="1*"/>
+
+		<DataGridTextColumn Header="Data Creazione"
+					x:DataType="entities:EmmaLog"
+					Binding="{Binding data_creazione, StringFormat=\{0:dd/MM/yyyy HH:mm\}}"
+					IsReadOnly="True"
+					Width="180"/>
+		
+		<DataGridTextColumn Header="Token Input"
+					x:DataType="entities:EmmaLog"
+					Binding="{Binding token_input}"
+					IsReadOnly="True"
+					IsVisible="True"
+					Width="150"/>
+
+
+		<DataGridTextColumn Header="Token Output"
+					x:DataType="entities:EmmaLog"
+					Binding="{Binding token_output}"
+					IsReadOnly="True"
+					IsVisible="True"
+					Width="150"/>
+
+
+		<DataGridTextColumn Header="Token Totali"
+					x:DataType="entities:EmmaLog"
+					Binding="{Binding token_tot}"
+					IsReadOnly="True"
+					IsVisible="True"
+					Width="150"/>
+
+
+		<DataGridTextColumn Header="Costo €."
+					x:DataType="entities:EmmaLog"
+					Binding="{Binding cost, StringFormat=\{0:0.000000\}}"
+					IsReadOnly="True"
+					IsVisible="True"
+					Width="200"/>
+
+
+
+		<DataGridTextColumn Header="Stato"
+					x:DataType="entities:EmmaLog"
+					Binding="{Binding stato}"
+					IsReadOnly="True"
+					IsVisible="True"
+					Width="100"/>
+
+
+		<DataGridTextColumn Header="Note"
+			x:DataType="entities:EmmaLog"
+			Binding="{Binding message}"
+			IsReadOnly="True"
+			IsVisible="True"
+			Width="*"/>
+
+
+	</DataGrid.Columns>
+	</DataGrid>
+	</Grid>
+</Window>

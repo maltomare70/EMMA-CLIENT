@@ -18,7 +18,7 @@
         <!-- Griglia principale dei Pulsanti (2 righe, 3 colonne) -->
         <UniformGrid Grid.Row="1" 
                      Rows="2" 
-                     Columns="2" 
+                     Columns="4" 
                      HorizontalAlignment="Center" 
                      VerticalAlignment="Center"
                      Margin="20"
@@ -71,37 +71,20 @@
                     <TextBlock Text="Articoli" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
                 </StackPanel>
             </Button>
-            
-            <Button Name="BtnConfigurazione" Width="200" Height="200" Margin="12" Click="Button_OnClick"   IsVisible="False"
-                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
-                    <TextBlock Text="⚙️" FontSize="42" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Impostazioni" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Button>
-            <!-- ================= RIGA 2: GESTIONE E STRUMENTI ================= -->
-
-            <!-- CARD 4: CONCILIAZIONE -->
-            <Button Name="BtnConciliazione" Width="180" Height="180" Margin="12" Click="Button_OnClick" IsVisible="False"
-                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
-                    <TextBlock Text="🔄" FontSize="42" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Conciliazione" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Button>
-
-            <!-- CARD 5: SINCRONIZZAZIONE -->
-            <Button Name="BtnSincronizzazione" Width="180" Height="180" Margin="12" Click="Button_OnClick"  IsVisible="False"
-                    Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
-                    <TextBlock Text="🌐" FontSize="42" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Sincronizza" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Button>
-
-            <!-- CARD 6: CONFIGURAZIONE -->
 
 
+			<Button Name="BtnLog" Width="200" Height="200" Margin="12" Click="Button_OnClick"
+		            Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
+				<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+					<Image Source="/Assets/log.png"
+                           Width="120"
+                           Height="120"
+                           VerticalAlignment="Center"/>
+					<TextBlock Text="Log" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+				</StackPanel>
+			</Button>
+
+			
         </UniformGrid>
     </Grid>
 </Window>

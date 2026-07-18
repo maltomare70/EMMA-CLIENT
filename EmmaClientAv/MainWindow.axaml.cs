@@ -44,7 +44,13 @@ public partial class MainWindow : Window
                     articoliForms.WindowState = WindowState.Maximized;
                     articoliForms.ShowDialog(this);
                     break;
-                    
+
+                case "BtnLog":
+                    var logForms = new LogForms();
+                    logForms.WindowState = WindowState.Maximized;
+                    logForms.ShowDialog(this);
+                    break;
+
                 case "BtnConfigurazione":
                     // Apri form Impostazioni
                     break;
