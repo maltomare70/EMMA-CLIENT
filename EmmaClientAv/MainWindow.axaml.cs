@@ -51,9 +51,12 @@ public partial class MainWindow : Window
                     logForms.ShowDialog(this);
                     break;
 
-                case "BtnConfigurazione":
-                    // Apri form Impostazioni
+                case "BtnChangePassword":
+                    var pwdForms = new PwdForm();
+                    pwdForms.ShowDialog(this);
                     break;
+
+
             }
         }
     }

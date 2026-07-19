@@ -1,0 +1,47 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+		Width="350" Height="250"
+        x:Class="EmmaClientAv.PwdForm"
+        Title="Cambio Password">
+
+
+	<StackPanel Margin="20" Spacing="15">
+
+		<!-- Campo Nuova Password -->
+		<StackPanel Spacing="5">
+			<TextBlock Text="Nuova Password:" FontWeight="SemiBold"/>
+			<TextBox Name="NewPasswordBox" PasswordChar="*" Watermark="Inserisci la nuova password"/>
+		</StackPanel>
+
+		<!-- Campo Conferma Password -->
+		<StackPanel Spacing="5">
+			<TextBlock Text="Conferma Password:" FontWeight="SemiBold"/>
+			<TextBox Name="ConfirmPasswordBox" PasswordChar="*" Watermark="Ripeti la nuova password"/>
+		</StackPanel>
+
+		<!-- Pulsanti di Azione -->
+		<Grid ColumnDefinitions="*, *" Margin="0,10,0,0">
+			<Button Grid.Column="0"
+                    Content="Esegui"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    Margin="0,0,5,0"
+					Name="Esegui"
+					Click="Esegui_Click"
+					/>
+
+			<Button Grid.Column="1"
+                    Content="Annulla"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    Margin="5,0,0,0"
+					Name="Annulla"
+					Click="Annulla_Click"
+					/>
+		</Grid>
+
+	</StackPanel>
+</Window>

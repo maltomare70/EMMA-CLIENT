@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="600"
         x:Class="EmmaClientAv.MainWindow"
-        Title="Emma Client"
+        Title="Emma Client 1.0.0"
         Background="#F5F7FA">
 
     <Grid RowDefinitions="Auto, *">
@@ -84,6 +84,16 @@
 				</StackPanel>
 			</Button>
 
+			<Button Name="BtnChangePassword" Width="200" Height="200" Margin="12" Click="Button_OnClick"
+		            Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="12">
+				<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+					<Image Source="/Assets/pwd.png"
+                           Width="120"
+                           Height="120"
+                           VerticalAlignment="Center"/>
+					<TextBlock Text="Cambio Password" FontSize="16" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+				</StackPanel>
+			</Button>
 			
         </UniformGrid>
     </Grid>
