@@ -50,12 +50,14 @@ public partial class VisDocForms : Window
     private ObservableCollection<MasterDocumento> DocumentiInGriglia { get; set; } = new();
     private readonly IFornitoriService _fornitoriService;
     private readonly IDocService _docService;
+    private readonly IArticoliService _articoliService;
     public VisDocForms()
     {
         InitializeComponent();
 
         _fornitoriService = new FornitoriService(App.Config.ServerUrl, App.CurrentApp.EMMMA_USER, App.CurrentApp.EMMMA_PASSWORD);
         _docService = new DocService(App.Config.ServerUrl, App.CurrentApp.EMMMA_USER, App.CurrentApp.EMMMA_PASSWORD);
+        _articoliService = new ArticoliService(App.Config.ServerUrl, App.CurrentApp.EMMMA_USER, App.CurrentApp.EMMMA_PASSWORD);
 
         var stati = ArticoliServiceManager.GetStatodocs();
         for (int i = 0; i < stati.Length; i++)
@@ -128,15 +130,35 @@ public partial class VisDocForms : Window
         string sep = ";";
         StringBuilder sb = new StringBuilder();
 
+
+        var fornitori = await _fornitoriService.GetFornitoriAsync();
+
         if (source is IEnumerable<MasterDocumento> listaDocumenti)
         {
             foreach (MasterDocumento doc in listaDocumenti)
             {
-                sb.AppendLine($"M{sep}{doc.Id}{sep}{doc.Fornitore}{sep}{doc.NumeroDocumento}{sep}{doc.DataDocumento}{sep}{doc.TipDocumento}{sep}{doc.StatoDocumento}");
+                string forn_ext = string.Empty;
+                var forn = fornitori.FirstOrDefault(x => x.descrizione.Equals(doc.Fornitore, StringComparison.InvariantCultureIgnoreCase));
+                if (forn is not null) forn_ext = forn.riferimento;
+                sb.AppendLine($"M{sep}{doc.Id}{sep}{doc.Fornitore}{sep}{doc.NumeroDocumento}{sep}{doc.DataDocumento}{sep}{doc.TipDocumento}{sep}{doc.StatoDocumento}{sep}{forn_ext}");
+
+                var articoli = await _articoliService.GetArticoliFornitore(doc.Fornitore!);
+
                 foreach (var item in doc.Dettagli)
                 {
-                    //TODO degli articoli si potrebbe aggiungere il riferimento esterno per facilitare la conciliazione
-                    sb.AppendLine($"R{sep}{item.IdRiga}{sep}{item.CodiceArticolo}{sep}{item.DescrizioneArticolo}{sep}{item.Qta}{sep}{item.UnitaMisura}");
+                    var art = articoli.FirstOrDefault(x => x.descrizione.Equals(item.DescrizioneArticolo, StringComparison.InvariantCultureIgnoreCase)
+                            || x.codice.Equals(item.CodiceArticolo, StringComparison.InvariantCultureIgnoreCase)
+                    );
+
+                    string art_ext_codice = string.Empty;
+                    string art_ext_descrizione = string.Empty;
+                    if (art is not null)
+                    {
+                        art_ext_codice = art.rifcodice;
+                        art_ext_descrizione = art.rifdescrizione;
+                    }
+
+                    sb.AppendLine($"R{sep}{item.IdRiga}{sep}{item.CodiceArticolo}{sep}{item.DescrizioneArticolo}{sep}{item.Qta}{sep}{item.UnitaMisura}{sep}{art_ext_codice}{sep}{art_ext_descrizione}");
                 }
             }
         }

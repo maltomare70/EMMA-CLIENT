@@ -31,12 +31,15 @@ public partial class PwdForm : Window
             return;
         }
 
+#if DEBUG
+           //nessuna regola password
+#else
         if (!PasswordValidator.IsPasswordValid(nuovaPassword))
         {
             await DialogHelper.ShowErrorDialog(this, "Errore", "La password deve essere lunga almeno 8 caratteri, contenere almeno una lettera maisucola un numero e un carattere speciale.");
             return;
         }
-
+#endif
         IUserService userService = new UserService(App.Config.ServerUrl, App.CurrentApp.EMMMA_USER, App.CurrentApp.EMMMA_PASSWORD);
         var userResponse = await userService.CambiaPasswordAsync(new EmmaServer.Entities.CambiaPasswordRequest()
         {

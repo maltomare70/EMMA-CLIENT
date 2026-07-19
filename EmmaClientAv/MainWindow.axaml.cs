@@ -53,6 +53,7 @@ public partial class MainWindow : Window
 
                 case "BtnChangePassword":
                     var pwdForms = new PwdForm();
+                    pwdForms.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                     pwdForms.ShowDialog(this);
                     break;
 
