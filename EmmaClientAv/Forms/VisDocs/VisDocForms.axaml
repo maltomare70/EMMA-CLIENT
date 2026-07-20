@@ -93,7 +93,7 @@
 							CornerRadius="4">
 						<StackPanel Orientation="Horizontal" Spacing="8">
 							<TextBlock Text="❌" VerticalAlignment="Center"/>
-							<TextBlock Text="Chiudi Tutto" VerticalAlignment="Center"/>
+							<TextBlock Text="Chiudi Stato" VerticalAlignment="Center"/>
 						</StackPanel>
 					</Button>
 					

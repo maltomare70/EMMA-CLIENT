@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="600"
         x:Class="EmmaClientAv.MainWindow"
-        Title="Emma Client 1.0.0"
+        Title="Emma Client 1.0.1"
         Background="#F5F7FA">
 
     <Grid RowDefinitions="Auto, *">
