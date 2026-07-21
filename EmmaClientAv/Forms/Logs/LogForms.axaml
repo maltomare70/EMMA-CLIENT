@@ -88,6 +88,15 @@
 			Width="*"/>
 
 
+		<DataGridTextColumn Header="Durata (sec.)"
+					x:DataType="entities:EmmaLog"
+					Binding="{Binding duration}"
+					IsReadOnly="True"
+					IsVisible="True"
+					Width="100"/>
+
+
+
 	</DataGrid.Columns>
 	</DataGrid>
 	</Grid>
