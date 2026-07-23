@@ -79,71 +79,75 @@ public partial class ArticoliForm : Window
         }
 
     }
-    
-    
+
+
     private async void ArticoliForm_Closing(object? sender, WindowClosingEventArgs e)
     {
+        // 1. Se stiamo già chiudendo programmaticamente, lascia passare la chiusura
         if (_autoChiusuraInCorso) return;
 
-        // 1. Forza il commit dell'eventuale cella attualmente in fase di editing nella griglia
+        // 2. Forza il commit dell'eventuale cella in fase di editing
         ArticoliGrid.CommitEdit();
 
-        // 2. Controlla se ci sono effettivamente modifiche o nuovi inserimenti
+        // 3. Controlla se ci sono modifiche
         bool haModifiche = Articoli.Any(f => f.id == 0 || f.IsDirty);
 
         if (!haModifiche)
         {
-            return; // Nessuna modifica, lascia chiudere la finestra normalmente
+            return; // Nessuna modifica: si chiude normalmente
         }
 
-        // 3. Blocca temporaneamente la chiusura immediata della finestra per permettere il salvataggio asincrono
+        // 4. Annulla SUBITO la chiusura per gestire il flusso asincrono
         e.Cancel = true;
 
+        // 5. Chiedi conferma all'utente
         var dialog = new ConfermaDialog();
         bool? risultato = await dialog.ShowDialog<bool?>(this);
+
+        // Gestione delle tre opzioni del Dialog:
+        // - se risultato è null (es. l'utente chiude il dialog con la X): interrompiamo e teniamo la finestra aperta
+        if (risultato == null)
+        {
+            return;
+        }
+
+        // Unsubscribe per evitare loop di eventi
+        this.Closing -= ArticoliForm_Closing;
+
+        // - Risultato == false (L'utente ha detto NO / ANNULLA SALVATAGGIO): 
+        // Chiudiamo direttamente la finestra senza eseguire il ciclo di salvataggio
         if (risultato == false)
         {
             this.Close();
+            return;
         }
-        ;
 
-        // Rimuoviamo l'evento per evitare un loop infinito quando richiameremo Close() alla fine
-        this.Closing -= ArticoliForm_Closing;
-
+        // - Risultato == true (L'utente ha detto SI): salviamo e poi chiudiamo
         try
         {
-            _autoChiusuraInCorso = true; // Evita che il prossimo Close() riesegua questo metodo
-
-            int aggiornati = 0;
-            int inseriti = 0;
+            _autoChiusuraInCorso = true;
 
             foreach (var articolo in Articoli)
             {
                 if (articolo.id == 0)
                 {
                     await _articoliService.AddArticolo(articolo);
-                    inseriti++;
                 }
                 else if (articolo.IsDirty)
                 {
                     await _articoliService.UpdateArticolo(articolo);
-
-                    // Resetta il flag dopo il salvataggio avvenuto con successo
                     articolo.IsDirty = false;
-                    aggiornati++;
                 }
             }
 
+            this.Close();
         }
         catch (Exception ex)
         {
             _autoChiusuraInCorso = false;
+            // Ripristiniamo l'evento se il salvataggio fallisce e vogliamo far rimanere la finestra aperta
+            this.Closing += ArticoliForm_Closing;
             System.Diagnostics.Debug.WriteLine($"Errore durante il salvataggio automatico: {ex.Message}");
-        }
-        finally
-        {
-            // 5. Chiudi definitivamente la finestra ora che l'operazione è terminata
-            this.Close();
         }
     }
 

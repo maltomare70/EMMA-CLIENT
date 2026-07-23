@@ -51,39 +51,51 @@ public partial class FornitoriForm : Window
             });
         }
     }
-    
+
     private async void FornitoriForm_Closing(object? sender, WindowClosingEventArgs e)
     {
+        // 1. Se stiamo già chiudendo programmaticamente, lascia passare la chiusura
         if (_autoChiusuraInCorso) return;
-        
-        // 1. Forza il commit dell'eventuale cella attualmente in fase di editing nella griglia
+
+        // 2. Forza il commit dell'eventuale cella attualmente in fase di editing nella griglia
         FornitoriGrid.CommitEdit();
 
-        // 2. Controlla se ci sono effettivamente modifiche o nuovi inserimenti
+        // 3. Controlla se ci sono effettivamente modifiche o nuovi inserimenti
         bool haModifiche = Fornitori.Any(f => f.id == 0 || f.IsDirty);
 
         if (!haModifiche)
         {
-            return; // Nessuna modifica, lascia chiudere la finestra normalmente
+            return; // Nessuna modifica: lascia chiudere la finestra normalmente
         }
-        
-        // 3. Blocca temporaneamente la chiusura immediata della finestra per permettere il salvataggio asincrono
+
+        // 4. Annulla SUBITO la chiusura per gestire il flusso asincrono
         e.Cancel = true;
 
+        // 5. Chiedi conferma all'utente
         var dialog = new ConfermaDialog();
         bool? risultato = await dialog.ShowDialog<bool?>(this);
+
+        // Se l'utente chiude il dialog con la X (null), annulliamo l'azione e lasciamo la finestra aperta
+        if (risultato == null)
+        {
+            return;
+        }
+
+        // Unsubscribe dall'evento prima di qualsiasi Close() manuale per evitare loop
+        this.Closing -= FornitoriForm_Closing;
+
+        // Se l'utente sceglie NO (false): chiudi direttamente senza salvare
         if (risultato == false)
         {
             this.Close();
-        };
-        
-        // Rimuoviamo l'evento per evitare un loop infinito quando richiameremo Close() alla fine
-        this.Closing -= FornitoriForm_Closing;
+            return;
+        }
 
+        // Se l'utente sceglie SÌ (true): procedi con il salvataggio
         try
         {
-            _autoChiusuraInCorso = true; // Evita che il prossimo Close() riesegua questo metodo
-            
+            _autoChiusuraInCorso = true;
+
             int aggiornati = 0;
             int inseriti = 0;
 
@@ -97,26 +109,26 @@ public partial class FornitoriForm : Window
                 else if (fornitore.IsDirty)
                 {
                     await _fornitoriService.UpdateFornitore(fornitore);
-            
+
                     // Resetta il flag dopo il salvataggio avvenuto con successo
-                    fornitore.IsDirty = false; 
+                    fornitore.IsDirty = false;
                     aggiornati++;
                 }
             }
 
+            // Salvataggio completato con successo: chiudi la finestra
+            this.Close();
         }
         catch (Exception ex)
         {
+            // In caso di errore ripristiniamo lo stato e l'evento così l'utente può riprovare
             _autoChiusuraInCorso = false;
+            this.Closing += FornitoriForm_Closing;
+
             System.Diagnostics.Debug.WriteLine($"Errore durante il salvataggio automatico: {ex.Message}");
         }
-        finally
-        {
-            // 5. Chiudi definitivamente la finestra ora che l'operazione è terminata
-            this.Close();
-        }
     }
-    
+
     private void Aggiungi_Click(object? sender, RoutedEventArgs e)
     {
         var nuovoFornitore = new EmmaFornitori
