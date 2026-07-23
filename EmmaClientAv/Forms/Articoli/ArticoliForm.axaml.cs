@@ -83,7 +83,68 @@ public partial class ArticoliForm : Window
     
     private async void ArticoliForm_Closing(object? sender, WindowClosingEventArgs e)
     {
+        if (_autoChiusuraInCorso) return;
 
+        // 1. Forza il commit dell'eventuale cella attualmente in fase di editing nella griglia
+        ArticoliGrid.CommitEdit();
+
+        // 2. Controlla se ci sono effettivamente modifiche o nuovi inserimenti
+        bool haModifiche = Articoli.Any(f => f.id == 0 || f.IsDirty);
+
+        if (!haModifiche)
+        {
+            return; // Nessuna modifica, lascia chiudere la finestra normalmente
+        }
+
+        // 3. Blocca temporaneamente la chiusura immediata della finestra per permettere il salvataggio asincrono
+        e.Cancel = true;
+
+        var dialog = new ConfermaDialog();
+        bool? risultato = await dialog.ShowDialog<bool?>(this);
+        if (risultato == false)
+        {
+            this.Close();
+        }
+        ;
+
+        // Rimuoviamo l'evento per evitare un loop infinito quando richiameremo Close() alla fine
+        this.Closing -= ArticoliForm_Closing;
+
+        try
+        {
+            _autoChiusuraInCorso = true; // Evita che il prossimo Close() riesegua questo metodo
+
+            int aggiornati = 0;
+            int inseriti = 0;
+
+            foreach (var articolo in Articoli)
+            {
+                if (articolo.id == 0)
+                {
+                    await _articoliService.AddArticolo(articolo);
+                    inseriti++;
+                }
+                else if (articolo.IsDirty)
+                {
+                    await _articoliService.UpdateArticolo(articolo);
+
+                    // Resetta il flag dopo il salvataggio avvenuto con successo
+                    articolo.IsDirty = false;
+                    aggiornati++;
+                }
+            }
+
+        }
+        catch (Exception ex)
+        {
+            _autoChiusuraInCorso = false;
+            System.Diagnostics.Debug.WriteLine($"Errore durante il salvataggio automatico: {ex.Message}");
+        }
+        finally
+        {
+            // 5. Chiudi definitivamente la finestra ora che l'operazione è terminata
+            this.Close();
+        }
     }
 
     private void Aggiungi_Click(object? sender, RoutedEventArgs e)
