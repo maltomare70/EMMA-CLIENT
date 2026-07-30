@@ -73,12 +73,11 @@ public partial class LoadDdtForm : Window
             Title = "Seleziona un File",
             AllowMultiple = false,
             FileTypeFilter = new[]
-            {
-                // Filtro per PDF
-                new FilePickerFileType("Documenti (*.pdf)")
+             {
+                new FilePickerFileType("Documenti PDF e XML")
                 {
-                    Patterns = new[] { "*.pdf"},
-                },
+                    Patterns = new[] { "*.pdf", "*.xml" }
+                }
             }
         };
 
